@@ -1,21 +1,26 @@
+
+## Need to implement GO / local ##
+
 allez <- function (scores,
                    lib,
-                   library.loc = NULL,
+                   library.loc=NULL,
                    sets = c("GO","KEGG"),
-                   collapse = c("full"),
-                   reduce = median,
+                   collapse = c("full", "partial", "none"),
+                   reduce = NULL,
                    setstat = c("mean", "var"),
                    universe = c("global", "local"),
                    transform = c("none", "binary", "rank", "nscore"),
                    cutoff = NULL,
-                   annotate = TRUE, ...)
+                   annotate = TRUE,
+                   max.n=NULL, ...)
 {
   stopifnot(any(!is.na(scores)))
+  scorenames <- names(scores)
   
-  if (any(duplicated(names(scores)))) 
+  if (any(duplicated(scorenames))) 
     stop("input IDs must be unique")
   if (any(is.na(scores)))
-    warning("scores contain NA's (will be ignored)")
+    warning("scores containing NA's will be ignored")
   if( !is.numeric(scores) ) 
     stop("scores must be numeric")
   vv <- apply( X=as.matrix(scores), MARGIN=2, FUN=var, na.rm=TRUE )
@@ -26,88 +31,83 @@ allez <- function (scores,
   transform <- match.arg(transform)
   collapse <- match.arg(collapse)
   setstat <- match.arg(setstat)
-  
+
+  ## Default reduce ##
+  uscores <- unique(scores)
+  if(is.null(reduce))
+   reduce <- if(length(uscores)==2 & identical(uscores,c(0,1))) max else median
+  if(length(uscores)==2 & !identical(uscores,c(0,1)))
+    warning("if scores are binary, please convert to {0,1}")
+
   message("Loading necessary libraries...")
   fn_loadSetLibraries( sets=sets )
-  fn_loadPlatformLibraries( Libraries=lib )
-  
-  message("Converting annotations to lists ...")
+  fn_loadPlatformLibraries( Libraries=lib, library.loc=library.loc )
 
+  set_id <- switch(sets, GO="go_id", KEGG="path_id")
   is.org <- substr(lib,1,3)=="org"
   orgpkg <- ifelse(is.org,lib[1],get(paste(lib[1],"ORGPKG",sep="")))
 
-  ## Use org info for ENTREZ TO GO/KEGG ID ##
-  set2eg <- switch(sets,
-            GO = toTable(getDataEnv(name="GO2ALLEGS",lib=orgpkg)),
-            KEGG = toTable(getDataEnv(name="PATH2EG",lib=orgpkg)))
-  org.symbol <- toTable(getDataEnv(name="SYMBOL",lib=orgpkg))
-  set2eg <- cbind(set2eg,
-                  org.symbol[match(set2eg$gene_id,org.symbol$gene_id),
-                  "symbol",drop=FALSE])
-  ## Remove gene_ids not on microarray ##
-  if(!is.org){
-    probe2eg <- toTable(getDataEnv(name="ENTREZID",lib=lib[1]))
-    egs <- unique(probe2eg$gene_id)
-    set2eg <- set2eg[set2eg$gene_id %in% egs,]
+  ## ANNOTATION ##
+  message("Converting annotations to data.frames ...")
+  if(!is.org & collapse %in% c("none","partial")){
+     set2probe <- toTable(getDataEnv(name=ifelse(sets=="GO",
+                        "GO2ALLPROBES","PATH2PROBE"),lib=lib[1]))
+     probe.symbol <- toTable(getDataEnv(name="SYMBOL",lib=lib[1]))
+     set2probe <- cbind(set2probe, probe.symbol[
+        match(set2probe$probe_id, probe.symbol$probe_id),"symbol",drop=FALSE])
+     ## remove probes not in scores vector ##
+     set2probe <- set2probe[set2probe$probe_id %in% names(scores),]
+     n.probes <-  table(unique(set2probe[,c(set_id,"probe_id")])[,1])
+   }
+  if(collapse != "none"){
+    ## Use org info for ENTREZ TO GO/KEGG ID ##
+    set2eg <- toTable(getDataEnv(name=ifelse(sets=="GO",
+              "GO2ALLEGS","PATH2EG"), lib=orgpkg))
+    org.symbol <- toTable(getDataEnv(name="SYMBOL",lib=orgpkg))
+    set2eg <- cbind(set2eg, org.symbol[
+              match(set2eg$gene_id,org.symbol$gene_id),"symbol",drop=FALSE])
+    n.genes <- table(unique(set2eg[,c(set_id, 'gene_id')])[,1])
+    ## Remove gene_ids not on microarray or scores##
+     if(!is.org){
+       probe2eg <- toTable(getDataEnv(name="ENTREZID",lib=lib[1]))
+       egs <- unique(probe2eg[probe2eg$probe_id %in% names(scores),"gene_id"])
+       set2eg <- set2eg[set2eg$gene_id %in% egs,]
+     } else set2eg <- set2eg[set2eg$gene_id %in% names(scores),]
   }
 
-  set_id <- switch(sets, GO="go_id", KEGG="path_id")
-  n.genes <- table(unique(set2eg[,c(set_id, 'gene_id')])[,1])
-  n.probes <- if(is.org) NA else 
-              table(unique(toTable(getDataEnv(
-                   name=ifelse(sets=="GO","GO2ALLPROBES","PATH2PROBE"),
-                   lib=lib[1]))[,c(set_id,"probe_id")])[,1])
-
-  ## I think do a special collapse for "none" 
+  ## SCORES ##
+  if(collapse != "none" & !is.org){
+      message("Reducing probe data to gene data...")
+      pscores <- data.frame(probe2eg,scores=scores[probe2eg$probe_id])
+      scores <- tapply(pscores$scores,as.character(pscores$gene_id),FUN=reduce)
+    }
+  gscores <- switch(transform,
+             none = scores,
+             rank = rank(scores),
+             nscore = qnorm( (rank(scores))/(length(scores)+1) ),
+             binary = {  
+               if (!is.numeric(cutoff))
+                 stop("cutoff must be numeric when transform = 'binary'")
+                 warning("cutoff used at collapsed gene level not probe level")
+               1 * (scores >= cutoff) })
   
-  if( collapse == "full" | is.org)
-  {
-    ## Reduce to gene level from probe level
-    message("Reducing probe data to gene data...")
-
-    scores.df <- data.frame(scores)
-    scores.df[[paste(ifelse(is.org,"gene","probe"),"id",sep="_")]] <-
-      rownames(scores.df)
-
-    if(!is.org){
-      probe2eg <- cbind(probe2eg, scores.df[
-            match(probe2eg$probe_id,scores.df$probe_id),"scores",drop=FALSE])
-      gscores.matrix <- aggregate(x=probe2eg$scores,
-            by=list(as.character(probe2eg$gene_id)), FUN=reduce)
-    } else gscores.matrix <- scores.df[,2:1]
-    gscores <- gscores.matrix[,2]
-    names(gscores.matrix) <- c('gene_id', 'gscores')
-    names(gscores) <- gscores.matrix$gene_id
-    
-    gscores <- switch(transform,
-               none = gscores,
-               rank = rank(gscores),
-               nscore = qnorm( (rank(gscores))/(length(gscores)+1) ),
-               binary = {  
-                 if (!is.numeric(cutoff))
-                  stop("cutoff must be numeric when transform = 'binary'")
-                  warning("cutoff used at collapsed gene level not probe level")
-                  1 * (gscores >= cutoff) })
-  }
-
 ## This needs to be changed for GO ?? check old allez code ##
   globe <- switch(sets,GO=gscores,
                   KEGG=gscores)
 
   mu.globe <- mean(globe)
   sigma.globe <- sd(globe)
-  G <- length(globe)      ## This line corresponds to line # 178 of WorkingScript_Allez.R
-  ## WHy isn't this already unique?  I don't know ##
-  set2eg <- unique(set2eg[,c(set_id, 'gene_id', 'symbol')])
-  setdata <- cbind(set2eg,
-          gscores.matrix[match(set2eg$gene_id,gscores.matrix$gene_id),
-                "gscores",drop=FALSE])
-
-  #setdata <- setdata[order(setdata[,set_id], setdata$symbol),]
+  G <- ifelse(is.null(max.n),length(globe),max.n)
   
-  set.means <- fn_getSetStats(SetData=setdata, Stat=mean, set_id=set_id)
-  set.sds <- fn_getSetStats(SetData=setdata, Stat=sd, set_id=set_id)
-  set.sizes <- fn_getSetStats(SetData=setdata, Stat=length, set_id=set_id)
+  setdata <- if(!is.org & collapse=="none"){
+         set2probe <- unique(set2probe[,c(set_id,"probe_id","symbol")])
+         data.frame(set2probe,gscores[set2probe$probe_id])} else {
+           set2eg <- unique(set2eg[,c(set_id, 'gene_id', 'symbol')])
+           data.frame(set2eg,gscores=gscores[set2eg$gene_id])}
+
+  set.means <- tapply(setdata$gscores,setdata[[set_id]],mean,na.rm=TRUE)
+  set.sds <- tapply(setdata$gscores,setdata[[set_id]],sd,na.rm=TRUE)
+  set.sizes <- table(setdata[[set_id]])
   
   if (setstat == "mean") {
     ok <- (set.sizes < G)
@@ -126,21 +126,19 @@ allez <- function (scores,
     z.score.Nandi <- (set.sds[ok]^2 - (sigma.globe^2))/sigma1.Nandi
   }
   
-## Where does this go?  n.probes is not defined ##  
   if (collapse == "partial") {
-    z.score <- z.score * sqrt(n.genes[ok]/n.probes[ok])
-    if (universe == "local") {
-      warning("partial correction not implemented for `local'", 
-              call. = FALSE)
-    }
+    if (universe == "local")
+      warning("partial correction not implemented for `local'", call. = FALSE)
+    if (is.org)
+      stop("partial correction not used at organism-level")
+   z.score <- z.score * sqrt(n.genes[ok]/n.probes[ok])
   }
-  clabs <- switch(collapse,
-        none = c("set.means", "set.sd", "n.probesets", "z.score"),
-        full = c("set.means", "set.sd", "n.genes", "z.score"),
-        partial = c("set.means", "set.sd", "n.probesets", "adjusted z.score"))
   
-  res <- cbind(set.means[ok], set.sds[ok], set.sizes[ok], z.score)
-  dimnames(res)[[2]] <- clabs
+  res <- data.frame(set.means=set.means[ok],set.sds=set.sds[ok],
+         n.genes=set.sizes[ok], z.score)
+  if(!is.org & collapse %in% c("none","partial")) names(res)[3] <- "n.probeset"
+  if(!is.org & collapse=="partial") names(res)[4] <- "adjusted z.score"
+
   aux <- list(set.data = setdata, globe = globe)
   if ((universe == "local") & (sets == "KEGG")) {
     warning("local universe only applicable with GO", call. = FALSE)

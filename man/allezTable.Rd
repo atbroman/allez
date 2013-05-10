@@ -9,7 +9,7 @@ Thresholds allez \code{setscores} element by number of genes in the set
 and z-score; orders sets from highest to lowest set mean.
 }
 \usage{
-allezTable(allez.out, n.low = 5, n.upp = 500, zthr = 6, type = c("gene_id", "symbol"), in.set = FALSE)
+allezTable(allez.out, n.low = 5, n.upp = 500, zthr = 5, type = c("gene_id", "symbol"), in.set = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

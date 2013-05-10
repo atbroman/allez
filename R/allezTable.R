@@ -3,7 +3,7 @@
 allezTable <- function(allez.out,
                        n.low=5,
                        n.upp=500,
-                       zthr=6,
+                       zthr=5,
                        type=c("gene_id","symbol"),
                        in.set=FALSE){
    type <- match.arg(type)

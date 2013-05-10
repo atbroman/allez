@@ -82,6 +82,8 @@ allez(scores, lib, library.loc = NULL, sets = c("GO", "KEGG"), collapse = c("ful
        \code{cutoff} }
     
   \item{annotate}{ logical, whether to include set names in the output }
+  \item{max.n}{numeric, maximum number of genes/probes in a set to
+  consider for output}   
 
   \item{\dots}{ Other arguments, passed on \code{reduce}. }
 }
