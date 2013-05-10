@@ -1,0 +1,15 @@
+
+## function to export ##
+export(allez)
+export(list2score)
+export(allezTable)
+export(allezC)
+export(allezMat)
+export(allezPlot)
+
+## import methods ##
+importMethodsFrom(AnnotationDbi,get)
+
+## import functions ##
+importFrom(graphics, image)
+importFrom(graphics, strwidth)
