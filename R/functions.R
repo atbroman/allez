@@ -56,17 +56,18 @@ fn_loadSetLibraries <- function(sets){
 ################################################################################
 #### This function loads required "platform" libraries for allez            ####
 ################################################################################
-fn_loadPlatformLibraries <- function(Libraries){
+fn_loadPlatformLibraries <- function(Libraries, library.loc=library.loc){
   for(lib in Libraries){
     if(substr(x=lib, start=nchar(lib)-2, stop=nchar(lib)) == '.db'){
       lib2 <- lib
     } else{
       lib2 <- paste(lib, 'db', sep='.')
     }
-    if(!try(require(package=lib2, character.only = TRUE), silent=TRUE)){
+    if(!try(require(package=lib2, character.only = TRUE,
+                    lib.loc=library.loc), silent=TRUE)){ 
       stop( paste('Please install', lib2) )
     } else{
-      require(package=lib2, character.only = TRUE)
+      require(package=lib2, character.only = TRUE, lib.loc=library.loc)
       message( paste( 'Loaded Package', lib2 ))
     }
     

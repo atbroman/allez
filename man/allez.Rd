@@ -15,7 +15,10 @@
  identify sets that show unusual variance characteristics.
 }
 \usage{
-allez(scores, lib, library.loc = NULL, sets = c("GO", "KEGG"), collapse = c("full"), reduce = median, setstat = c("mean", "var"), universe = c("global", "local"), transform = c("none", "binary", "rank", "nscore"), cutoff = NULL, annotate = TRUE, ...)
+allez(scores, lib, library.loc = NULL, sets = c("GO", "KEGG"), collapse
+= c("full","partial","none"), reduce = NULL, setstat = c("mean", "var"),
+universe = c("global", "local"), transform = c("none", "binary", "rank",
+"nscore"), cutoff = NULL, annotate = TRUE, max.n=NULL, ...)
 }
 
 \arguments{
