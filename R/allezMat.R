@@ -10,12 +10,11 @@ allezMat <- function(allez.out,
   ok <- (allez.out$setscores$n.genes >= n.low) &
          (allez.out$setscores$n.genes <= n.upp) &
          (allez.out$setscores$z.score >= zthr)
-## genes by GO/KEGG category, 0 if not in cat, 1 if in category##
+## allez.out$aux$set.data: 1st col = set id; 2nd col = gene id ##
+## mat: genes by GO/KEGG category, 0 if not in cat, 1 if in category ##
   mat <- sapply(rownames(allez.out$setscores)[ok],function(x)
        as.numeric(names(allez.out$aux$globe) %in%
-       allez.out$aux$set.data[allez.out$aux$set.data[,
-       grep("go|path",colnames(allez.out$aux$set.data))]==x,
-       grep("gene|probe",colnames(allez.out$aux$set.data))]))
+       allez.out$aux$set.data[allez.out$aux$set.data[,1]==x,2]))
   rownames(mat) <- names(allez.out$aux$globe)
   mat
 }

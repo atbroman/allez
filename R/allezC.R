@@ -16,15 +16,15 @@ allezC <- function(...){
   setscores <- set.data <- globe <- NULL
   for(i in 1:length(dots)){
     ss <- switch(names(dots[[i]]$setscores)[1],
-          "Term"={x <- dots[[i]]$setscores
-                names(x)[1:2] <- c("category","name")
-                x},
-          "path_name"={x <- data.frame(category="kegg",dots[[i]]$setscores)
-                names(x)[2] <- "name"
-                x})
+          "Term"= dots[[i]]$setscores,
+          "path_name"={x <- data.frame(
+                       Term = dots[[i]]$setscores[,1],
+                       Ontology = "KEGG",
+                       dots[[i]]$setscores[,2:5])
+                       x})
     setscores <- rbind(setscores,
           ss[is.na(match(rownames(ss),rownames(setscores))),])
-    names(dots[[i]]$aux$set.data)[2] <- "id"
+    names(dots[[i]]$aux$set.data)[1] <- "set_id"
     set.data <- unique(rbind(set.data, dots[[i]]$aux$set.data))
 
     globe <- c(globe,
