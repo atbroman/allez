@@ -17,6 +17,21 @@ ordMat <- function(aMat,allez.out){
   apply(aMat[rind,cind,drop=FALSE],2,"*",allez.out$aux$globe[rind])
 }
 
+ordMat2 <- function(aMat,allez.out){
+  rind <- cind <- character(0)
+  for(i in 1:ncol(aMat)){
+    mat <- if(i==1) aMat*allez.out$aux$globe else
+           aMat[-match(rind,rownames(aMat)),
+                -match(cind,colnames(aMat)),drop=FALSE]*
+           allez.out$aux$globe[-match(rind,names(allez.out$aux$globe))]
+    smax <- which.max(apply(mat,2,sum)) ## set with highest sum
+    cind <- c(cind,colnames(mat)[smax])
+    rord <- order(mat[,smax],decreasing=TRUE)
+    rind <- c(rind,rownames(mat)[rord][mat[rord,smax]>0])
+  }
+  apply(aMat[rind,cind,drop=FALSE],2,"*",allez.out$aux$globe[rind])
+}
+
 allezplot <- function(aOrd,...){
   require(GO.db)
   require(KEGG.db)
@@ -52,7 +67,7 @@ allezPlot <- function(allez.out,
                      n.upp=500,
                      zthr=3,
                      ...){
-  aMat <- allezMat(allez.out,n.low,n.upp,zthr)
-  aOrd <- ordMat(aMat,allez.out)
+system.time(  aMat <- allezMat(allez.out,n.low,n.upp,zthr))
+system.time(  aOrd <- ordMat(aMat,allez.out))
   allezplot(aOrd,...)
 }

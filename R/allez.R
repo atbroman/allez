@@ -79,7 +79,8 @@ allez <- function (scores,
   if(collapse != "none" & !is.org){
       message("Reducing probe data to gene data...")
       pscores <- data.frame(probe2eg,scores=scores[probe2eg$probe_id])
-      scores <- tapply(pscores$scores,as.character(pscores$gene_id),FUN=reduce)
+      scores <- unlist(tapply(pscores$scores,as.character(pscores$gene_id),
+                       FUN=reduce,simplify=FALSE))
     }
   gscores <- switch(transform,
              none = scores,
@@ -105,8 +106,10 @@ allez <- function (scores,
            set2eg <- unique(set2eg[,c(set_id, 'gene_id', 'symbol')])
            data.frame(set2eg,gscores=gscores[set2eg$gene_id])}
 
-  set.means <- tapply(setdata$gscores,setdata[[set_id]],mean,na.rm=TRUE)
-  set.sds <- tapply(setdata$gscores,setdata[[set_id]],sd,na.rm=TRUE)
+  set.means <- unlist(tapply(setdata$gscores,setdata[[set_id]],
+                      mean,na.rm=TRUE,simplify=FALSE))
+  set.sds <- unlist(tapply(setdata$gscores,setdata[[set_id]],
+                    sd,na.rm=TRUE,simplify=FALSE))
   set.sizes <- table(setdata[[set_id]])
   
   if (setstat == "mean") {
@@ -126,12 +129,10 @@ allez <- function (scores,
     z.score.Nandi <- (set.sds[ok]^2 - (sigma.globe^2))/sigma1.Nandi
   }
   
-  if (collapse == "partial") {
+  if (!is.org & collapse == "partial") {
     if (universe == "local")
       warning("partial correction not implemented for `local'", call. = FALSE)
-    if (is.org)
-      stop("partial correction not used at organism-level")
-   z.score <- z.score * sqrt(n.genes[ok]/n.probes[ok])
+    z.score <- z.score * sqrt(n.genes[ok]/n.probes[ok])
   }
   
   res <- data.frame(set.means=set.means[ok],set.sds=set.sds[ok],
