@@ -17,7 +17,8 @@ ordMat <- function(aMat,allez.out){
   apply(aMat[rind,cind,drop=FALSE],2,"*",allez.out$aux$globe[rind])
 }
 
-allezplot <- function(aOrd,...){
+allezplot <- function(aOrd, allez.out,
+              glab=c("none","gene_id","symbol"), ...){
   require(GO.db)
   require(KEGG.db)
 
@@ -28,22 +29,43 @@ allezplot <- function(aOrd,...){
   allterm <- rbind(goterm,keggterm)
   term <- allterm[match(colnames(aOrd),allterm$id),]
 
+  glab <- match.arg(glab)
+
   p <- par(no.readonly=TRUE)
+
+  xlabs <- switch(glab,
+          "none" = 1:nrow(aOrd),
+          "gene_id" = rownames(aOrd),
+          "symbol" = allez.out$aux$set.data[
+            match(rownames(aOrd),allez.out$aux$set.data[,2]),"symbol"])
+
   ## Space for text in xlim ##
   xpos <- apply(aOrd,2,function(x)
        (1:length(x))[x>0][which.max((1:length(x))[x>0])])
+  mwidth1 <- strwidth(xlabs,units="inches")
+  mwidth2 <- strwidth(term$id,units="inches")
+  twidth <- strwidth(term$term,units="inches")+0.5*par("cin")[1]
 
-  mwidth <- strwidth(term$id,units="inches")
-  mai <- par("mai")
-  par(mai=c(mai[1],mai[4]+max(mwidth),mai[3:4]))
-
-  twidth <- (strwidth(term$term,units="inches")+
-             0.5*par("cin")[1])/par("pin")[1]            
-  image(1:nrow(aOrd),1:ncol(aOrd),aOrd[,ncol(aOrd):1],
-   xlab="",ylab="", yaxt="n",col=gray(seq(1,0,length=64)),
-   xlim=c(0.5,max((xpos+0.5)/(1-twidth))),...)
-  axis(side=2,at=1:ncol(aOrd),labels=colnames(aOrd)[ncol(aOrd):1],las=1,...)
-  text(xpos+0.5,ncol(aOrd):1,term$term,pos=4,...)
+  if(glab=="none"){
+    par(mai=c(par("mai")[1],max(mwidth2)+par("mgp")[2]*par("cin")[2],
+          par("mai")[3:4]))
+    image(1:nrow(aOrd),1:ncol(aOrd),aOrd[,ncol(aOrd):1],
+          xlab="",ylab="", yaxt="n",col=gray(seq(1,0,length=64)),
+          xlim=c(0.5,max((xpos+0.5)/(1-twidth/par("pin")[1]))))
+  } else {
+    pwidth <- xpos*par("cin")[2]+0.5+twidth
+    if(max(pwidth)>par("fin")[1])
+      warning("Increase width of figure")
+    par(pin=c(max(pwidth),par("pin")[2]),
+        mai=c(max(mwidth1)+par("mgp")[2]*par("cin")[2],
+          max(mwidth2)+par("mgp")[2]*par("cin")[2],par("mai")[3:4]))
+    image(1:nrow(aOrd),1:ncol(aOrd),aOrd[,ncol(aOrd):1],
+          xlab="",ylab="", yaxt="n", xaxt="n",col=gray(seq(1,0,length=64)),
+          xlim=c(0.5,max((xpos+0.5)/(1-twidth))))
+    axis(side=1,at=1:nrow(aOrd),labels=xlabs,las=2, ...)
+  }
+  axis(side=2,at=1:ncol(aOrd),labels=colnames(aOrd)[ncol(aOrd):1],las=1, ...)
+  text(xpos+0.5,ncol(aOrd):1,term$term,pos=4, ...)
   par(p)
 }
 
@@ -51,8 +73,12 @@ allezPlot <- function(allez.out,
                      n.low=5,
                      n.upp=500,
                      zthr=3,
+                     gmax=20,
+                     glab=c("none","gene_id","symbol"),
                      ...){
-system.time(  aMat <- allezMat(allez.out,n.low,n.upp,zthr))
-system.time(  aOrd <- ordMat(aMat,allez.out))
-  allezplot(aOrd,...)
+aMat <- allezMat(allez.out,n.low,n.upp,zthr)
+aOrd <- ordMat(aMat,allez.out)
+allezplot(aOrd,allez.out,
+          glab=ifelse(nrow(aOrd)<=gmax,glab,"none"),
+          ...)
 }
