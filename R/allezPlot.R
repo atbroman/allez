@@ -5,21 +5,6 @@
 ordMat <- function(aMat,allez.out){
   rind <- cind <- character(0)
   for(i in 1:ncol(aMat)){
-    mat <- if(i==1) apply(aMat,2,"*",allez.out$aux$globe) else
-           apply(aMat[-match(rind,rownames(aMat)),
-                -match(cind,colnames(aMat)),drop=FALSE],2,"*",
-           allez.out$aux$globe[-match(rind,names(allez.out$aux$globe))])
-    smax <- which.max(apply(mat,2,sum)) ## set with highest sum
-    cind <- c(cind,colnames(mat)[smax])
-    rord <- order(mat[,smax],decreasing=TRUE)
-    rind <- c(rind,rownames(mat)[rord][mat[rord,smax]>0])
-  }
-  apply(aMat[rind,cind,drop=FALSE],2,"*",allez.out$aux$globe[rind])
-}
-
-ordMat2 <- function(aMat,allez.out){
-  rind <- cind <- character(0)
-  for(i in 1:ncol(aMat)){
     mat <- if(i==1) aMat*allez.out$aux$globe else
            aMat[-match(rind,rownames(aMat)),
                 -match(cind,colnames(aMat)),drop=FALSE]*
