@@ -12,7 +12,7 @@ allez <- function (scores,
                    transform = c("none", "binary", "rank", "nscore"),
                    cutoff = NULL,
                    annotate = TRUE,
-                   max.n=NULL, ...)
+                   ...)
 {
   stopifnot(any(!is.na(scores)))
   scorenames <- names(scores)
@@ -98,7 +98,7 @@ allez <- function (scores,
 
   mu.globe <- mean(globe)
   sigma.globe <- sd(globe)
-  G <- ifelse(is.null(max.n),length(globe),max.n)
+  G <- length(globe) ## Used to check "local" universe
   
   set.data <- if(!is.org & collapse=="none"){
          set2probe <- unique(set2probe[,c(set_id,"probe_id","symbol")])

@@ -18,7 +18,7 @@
 allez(scores, lib, library.loc = NULL, sets = c("GO", "KEGG"), collapse
 = c("full","partial","none"), reduce = NULL, setstat = c("mean", "var"),
 universe = c("global", "local"), transform = c("none", "binary", "rank",
-"nscore"), cutoff = NULL, annotate = TRUE, max.n=NULL, ...)
+"nscore"), cutoff = NULL, annotate = TRUE, ...)
 }
 
 \arguments{
@@ -85,8 +85,6 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
        \code{cutoff} }
     
   \item{annotate}{ logical, whether to include set names in the output }
-  \item{max.n}{numeric, maximum number of genes/probes in a set to
-  consider for output}   
 
   \item{\dots}{ Other arguments, passed on \code{reduce}. }
 }
