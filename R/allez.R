@@ -100,17 +100,17 @@ allez <- function (scores,
   sigma.globe <- sd(globe)
   G <- ifelse(is.null(max.n),length(globe),max.n)
   
-  setdata <- if(!is.org & collapse=="none"){
+  set.data <- if(!is.org & collapse=="none"){
          set2probe <- unique(set2probe[,c(set_id,"probe_id","symbol")])
          data.frame(set2probe,gscores[set2probe$probe_id])} else {
            set2eg <- unique(set2eg[,c(set_id, 'gene_id', 'symbol')])
            data.frame(set2eg,gscores=gscores[set2eg$gene_id])}
 
-  set.means <- unlist(tapply(setdata$gscores,setdata[[set_id]],
+  set.means <- unlist(tapply(set.data$gscores,set.data[[set_id]],
                       mean,na.rm=TRUE,simplify=FALSE))
-  set.sds <- unlist(tapply(setdata$gscores,setdata[[set_id]],
+  set.sds <- unlist(tapply(set.data$gscores,set.data[[set_id]],
                     sd,na.rm=TRUE,simplify=FALSE))
-  set.sizes <- table(setdata[[set_id]])
+  set.sizes <- table(set.data[[set_id]])
   
   if (setstat == "mean") {
     ok <- (set.sizes < G)
@@ -140,7 +140,7 @@ allez <- function (scores,
   if(!is.org & collapse %in% c("none","partial")) names(res)[3] <- "n.probeset"
   if(!is.org & collapse=="partial") names(res)[4] <- "adjusted z.score"
 
-  aux <- list(set.data = setdata, globe = globe)
+  aux <- list(set.data = set.data, globe = globe)
   if ((universe == "local") & (sets == "KEGG")) {
     warning("local universe only applicable with GO", call. = FALSE)
   }
