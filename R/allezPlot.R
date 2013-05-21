@@ -47,7 +47,8 @@ allezplot <- function(aOrd, allez.out,
   twidth <- strwidth(term$term,units="inches")+0.5*par("cin")[1]
 
   if(glab=="none"){
-    par(mai=c(par("mai")[1],max(mwidth2)+par("mgp")[2]*par("cin")[2],
+    par(mai=c(par("mai")[1],
+          max(mwidth2)+par("mgp")[2]*par("cin")[2]+par("mai")[4],
           par("mai")[3:4]))
     image(1:nrow(aOrd),1:ncol(aOrd),aOrd[,ncol(aOrd):1],
           xlab="",ylab="", yaxt="n",col=gray(seq(1,0,length=64)),
@@ -55,8 +56,9 @@ allezplot <- function(aOrd, allez.out,
   } else {
     pwidth <- (xpos+1)*par("cin")[2]+twidth ## plot width, inches ##
     par(pin=c(max(pwidth),par("pin")[2]),
-        mai=c(max(mwidth1)+par("mgp")[2]*par("cin")[2],
-          max(mwidth2)+par("mgp")[2]*par("cin")[2],par("mai")[3:4]))
+        mai=c(max(mwidth1)+par("mgp")[2]*par("cin")[2]+par("mai")[4],
+          max(mwidth2)+par("mgp")[2]*par("cin")[2]+par("mai")[4],
+          par("mai")[3:4]))
     if(max(pwidth)/diff(par("plt")[1:2])>par("fin")[1])
       warning(paste("Increase width of figure to at least",
               round(max(pwidth)/diff(par("plt")[1:2]),2),
