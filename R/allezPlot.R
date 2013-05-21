@@ -53,12 +53,14 @@ allezplot <- function(aOrd, allez.out,
           xlab="",ylab="", yaxt="n",col=gray(seq(1,0,length=64)),
           xlim=c(0.5,max((xpos+0.5)/(1-twidth/par("pin")[1]))))
   } else {
-    pwidth <- xpos*par("cin")[2]+0.5+twidth
-    if(max(pwidth)>par("fin")[1])
-      warning("Increase width of figure")
+    pwidth <- (xpos+1)*par("cin")[2]+twidth ## plot width, inches ##
     par(pin=c(max(pwidth),par("pin")[2]),
         mai=c(max(mwidth1)+par("mgp")[2]*par("cin")[2],
           max(mwidth2)+par("mgp")[2]*par("cin")[2],par("mai")[3:4]))
+    if(max(pwidth)/diff(par("plt")[1:2])>par("fin")[1])
+      warning(paste("Increase width of figure to at least",
+              round(max(pwidth)/diff(par("plt")[1:2]),2),
+              "inches and re-run allezPlot"))
     image(1:nrow(aOrd),1:ncol(aOrd),aOrd[,ncol(aOrd):1],
           xlab="",ylab="", yaxt="n", xaxt="n",col=gray(seq(1,0,length=64)),
           xlim=c(0.5,max((xpos+0.5)/(1-twidth/par("pin")[1]))))
