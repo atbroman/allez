@@ -58,6 +58,7 @@ allez <- function (scores,
      ## remove probes not in scores vector ##
      set2probe <- set2probe[set2probe$probe_id %in% names(scores),]
      n.probes <-  table(unique(set2probe[,c(set_id,"probe_id")])[,1])
+     set.names <- set2probe
    }
   if(collapse != "none"){
     ## Use org info for ENTREZ TO GO/KEGG ID ##
@@ -73,6 +74,7 @@ allez <- function (scores,
        egs <- unique(probe2eg[probe2eg$probe_id %in% names(scores),"gene_id"])
        set2eg <- set2eg[set2eg$gene_id %in% egs,]
      } else set2eg <- set2eg[set2eg$gene_id %in% names(scores),]
+    set.names <- set2eg
   }
 
   ## SCORES ##
@@ -98,7 +100,7 @@ allez <- function (scores,
 
   mu.globe <- mean(globe)
   sigma.globe <- sd(globe)
-  G <- length(globe) ## Used to check "local" universe
+  G <- length(globe)
   
   set.data <- if(!is.org & collapse=="none"){
          set2probe <- unique(set2probe[,c(set_id,"probe_id","symbol")])
@@ -110,21 +112,22 @@ allez <- function (scores,
                       mean,na.rm=TRUE,simplify=FALSE))
   set.sds <- unlist(tapply(set.data$gscores,set.data[[set_id]],
                     sd,na.rm=TRUE,simplify=FALSE))
+  ## ALL set.sizes < G, see Annotation section ##
   set.sizes <- table(set.data[[set_id]])
   
   if (setstat == "mean") {
-    ok <- (set.sizes < G)
-    dd <- sigma.globe * fact(G=G, m=set.sizes[ok])
-    z.score <- (set.means[ok] - mu.globe)/dd
+    dd <- sigma.globe * fact(G=G, m=set.sizes)
+    z.score <- (set.means - mu.globe)/dd
   }
   
   if (setstat == "var") {
-    ok <- (set.sizes < G) & (set.sizes > 3)
+    ok <- set.sizes > 3
     E.globe <- fn_getE.Globe(globe=globe)
     sigma1 <- apply(X=as.matrix(set.sizes[ok]), MARGIN=1, FUN=sigma.fun, 
                     E = E.globe, esig2 = sigma.globe^2)
     z.score <- (set.sds[ok]^2 - (sigma.globe^2))/sigma1
-    sigma1.Nandi <- apply(X=as.matrix(set.sizes[ok]), MARGIN=1, FUN=sigma.fun.Nandi, 
+    sigma1.Nandi <- apply(X=as.matrix(set.sizes[ok]), MARGIN=1,
+                          FUN=sigma.fun.Nandi, 
                           E = E.globe, esig2 = sigma.globe^2)
     z.score.Nandi <- (set.sds[ok]^2 - (sigma.globe^2))/sigma1.Nandi
   }
@@ -132,11 +135,12 @@ allez <- function (scores,
   if (!is.org & collapse == "partial") {
     if (universe == "local")
       warning("partial correction not implemented for `local'", call. = FALSE)
-    z.score <- z.score * sqrt(n.genes[ok]/n.probes[ok])
+    z.score <- z.score * sqrt(n.genes/n.probes)
   }
   
-  res <- data.frame(set.means=set.means[ok],set.sds=set.sds[ok],
-         n.genes=set.sizes[ok], z.score)
+  res <- data.frame(set.means=set.means,set.sds=set.sds,
+         n.genes=set.sizes[names(set.means)],
+         z.score=z.score[names(set.means)])
   if(!is.org & collapse %in% c("none","partial")) names(res)[3] <- "n.probeset"
   if(!is.org & collapse=="partial") names(res)[4] <- "adjusted z.score"
 

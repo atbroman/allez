@@ -61,7 +61,7 @@ allezplot <- function(aOrd, allez.out,
           max(mwidth2)+par("mgp")[2]*par("cin")[2],par("mai")[3:4]))
     image(1:nrow(aOrd),1:ncol(aOrd),aOrd[,ncol(aOrd):1],
           xlab="",ylab="", yaxt="n", xaxt="n",col=gray(seq(1,0,length=64)),
-          xlim=c(0.5,max((xpos+0.5)/(1-twidth))))
+          xlim=c(0.5,max((xpos+0.5)/(1-twidth/par("pin")[1]))))
     axis(side=1,at=1:nrow(aOrd),labels=xlabs,las=2, ...)
   }
   axis(side=2,at=1:ncol(aOrd),labels=colnames(aOrd)[ncol(aOrd):1],las=1, ...)
