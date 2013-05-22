@@ -81,7 +81,7 @@ allezplot <- function(aOrd, allez.out,
   if(slab!="none"){
     axis(side=4,at=1:ncol(aOrd),labels=zlabs[ncol(aOrd):1],
          las=1,mgp=c(0,max(mwidth4)/par("cin")[2],0)+par("mgp"),hadj=1, ...)
-    axis(side=4,at=1.04*(ncol(aOrd)-1),tick=FALSE,
+    axis(side=4,at=ncol(aOrd)+0.5,tick=FALSE,
          labels=slab,las=1,mgp=c(0,max(mwidth4)/par("cin")[2],0)+par("mgp"),
          hadj=1,padj=0,xpd=TRUE, ...)
   }
