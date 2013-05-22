@@ -9,7 +9,7 @@ Thresholds allez \code{setscores} element by number of genes in the set
 and z-score; orders sets from highest to lowest set mean.
 }
 \usage{
-allezTable(allez.out, n.low = 5, n.upp = 500, zthr = 5, type = c("gene_id", "symbol"), in.set = FALSE)
+allezTable(allez.out, n.low = 5, n.upp = 500, n.cell=0, zthr = 5, type = c("gene_id", "symbol"), in.set = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -18,6 +18,8 @@ allezTable(allez.out, n.low = 5, n.upp = 500, zthr = 5, type = c("gene_id", "sym
     consider for ranking}
   \item{n.upp}{numeric, largest number of genes in a set to
     consider for ranking}
+  \item{n.cell}{numeric, minimum number of genes in a set with score>0,
+    mainly used for binary scores}
   \item{zthr}{numeric, threshold z-scores at this level}
   \item{type}{string, either \code{gene_id} or \code{symbol} will list
     entrez ID or gene symbol, respectively for genes in the set.} 
