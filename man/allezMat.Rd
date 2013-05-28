@@ -10,7 +10,7 @@ indicator matrix of the highest ranking sets; sets IDs are listed as
 columns, genes as rows.
 }
 \usage{
-allezMat(allez.out, n.low = 5, n.upp = 500, n.cell=0, zthr = 3)
+allezMat(allez.out, n.low = 5, n.upp = 500, n.cell = 0, zthr = 3)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

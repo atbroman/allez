@@ -126,3 +126,11 @@ fn_getSetStats <- function(SetData, Stat=mean, set_id=set_id){
   names(set.stats) <- set.stats.df$Group.1
   return(set.stats)
 }
+
+## Local Universe ##
+local.max <- function(setscores){
+  if(!as.logical(grep("local.zscore",colnames(setscores))))
+    stop("setscores must be from universe='local'")
+  do.call(rbind,by(setscores,setscores[,1],
+     function(x) x[which.max(x$local.zscore),]))
+}

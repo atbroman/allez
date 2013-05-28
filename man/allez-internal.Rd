@@ -9,6 +9,7 @@
 \alias{sigma.fun}
 \alias{sigma.fun.Nandi}
 \alias{fn_getSetStats}
+\alias{local.max}
 
 \alias{ordMat}
 \alias{allezplot}

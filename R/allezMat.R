@@ -9,12 +9,12 @@ allezMat <- function(allez.out,
                      zthr=3){
 ## Number of genes in list and functional set ##
   nc <- sapply(rownames(allez.out$setscores), function(x){
-            s <- allez.out$aux$set.scores[
-                 allez.out$aux$set.scores[,1] %in% x,"gscores"]
+            s <- allez.out$aux$set.data[
+                 allez.out$aux$set.data[,1] %in% x,"gscores"]
             sum(s>0 & !is.na(x))})
 ## Subset of GO/KEGG terms ##
-  ok <- (allez.out$setscores$n.genes >= n.low) &
-         (allez.out$setscores$n.genes <= n.upp) &
+  ok <- (allez.out$setscores$set.size >= n.low) &
+         (allez.out$setscores$set.size <= n.upp) &
          (allez.out$setscores$z.score >= zthr) &
          (nc >= n.cell)
 ## allez.out$aux$set.data: 1st col = set id; 2nd col = gene id ##

@@ -29,11 +29,9 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
   significant differential expression (i.e. gene list), 
   posterior probability of differential expression, or correlation
   with some phenotype.
-
   For microarray-level scores, the vector must be named with
   manufacturer probe names; for example, \code{scores} must be 
   named by the Affymetrix probe set IDs.
-
   For organism-level scores, the vector must be named with Entrez Gene
   Identifiers. 
   }
@@ -46,24 +44,23 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
 %%     ~~Describe \code{library.loc} here~~
 }
 \item{sets}{character string, describing the collection of
-  sets. Default is \code{"GO"}; \code{"KEGG"} is supported. }
+  sets. \code{"GO"} (default) or \code{"KEGG"}}
 \item{collapse}{character string, describing the method for reducing
-  probe-level data to gene-level data. Default is \code{"full"} which
-  uses the function \code{reduce} to collapse data from multiple probes
-  on the same gene down to a single record per gene.  This uses the
+  probe-level data to gene-level data. \code{"full"} (default) uses the
+  function \code{reduce} to reduce from 
+  probe level to gene level. This uses the
   \code{ENTREZID} class associated with the data
-  package/s. \code{"none"} directs the calculation to stay at the probe
-  level rather than the gene level.  \code{"partial"} forces an
-  adjustment to the z-scores computed in \code{"none"} by the factor
-  sqrt{ n.genes/n.probes }. }
+  package/s.  \code{"none"} probe level results
+  \code{"partial"} adjustment to the z-scores computed in \code{"full"}
+  by the factor sqrt{ n.genes/n.probes }. }
 
-  \item{reduce}{ function used in \code{collapse}. }
+\item{reduce}{ function used in \code{collapse}. }
 
-  \item{setstat}{ \code{"mean"} or \code{"var"} indicating the function
+\item{setstat}{ \code{"mean"} or \code{"var"} indicating the function
    used to compute unstandardized set scores from microarray level
    scores. }
 
-  \item{universe}{ If \code{"global"}, each set's score is compared to
+ \item{universe}{ If \code{"global"}, each set's score is compared to
    the score of a random set taken from all annotated genes (if
    \code{collapse="full"} or scores are organism-level) or
    probes (otherwise). If \code{"local"}, comparison is made not to the
@@ -72,7 +69,7 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
    multiple parents per set, the one with the largest Z score is
    reported.}
 
-  \item{transform}{ optional transformation of microarray-level data.
+ \item{transform}{ optional transformation of microarray-level data.
     If \code{"binary"}, a cutoff must
     also be supplied. Transformation is done after collapsing to
     gene level if \code{collapse="full"}.   \code{"nscore"} is the
