@@ -14,13 +14,6 @@ allez <- function (scores,
                    annotate = TRUE,
                    ...)
 {
-  
-  sets <- match.arg(sets)
-  universe <- match.arg(universe)
-  transform <- match.arg(transform)
-  collapse <- match.arg(collapse)
-  setstat <- match.arg(setstat)
-
   stopifnot(any(!is.na(scores)))
   scorenames <- names(scores)
 
@@ -42,6 +35,12 @@ allez <- function (scores,
   if(transform=="binary" & !is.numeric(cutoff))
     stop("cutoff must be numeric when transform = 'binary'")
 
+  sets <- match.arg(sets)
+  universe <- match.arg(universe)
+  transform <- match.arg(transform)
+  collapse <- match.arg(collapse)
+  setstat <- match.arg(setstat)
+
   ## Default reduce ##
   uscores <- unique(scores)
   if(is.null(reduce))
@@ -59,7 +58,7 @@ allez <- function (scores,
 
   ## ANNOTATION ##
   message("Converting annotations to data.frames ...")
-  if(!is.org & collapse %in% c("none","partial")){
+  if(!is.org & collapse != "full"){
      set2probe <- toTable(getDataEnv(name=ifelse(sets=="GO",
                         "GO2ALLPROBES","PATH2PROBE"),lib=lib[1]))
      probe.symbol <- toTable(getDataEnv(name="SYMBOL",lib=lib[1]))
@@ -84,7 +83,7 @@ allez <- function (scores,
   }
 
   ## SCORES ##
-  if(collapse != "none" & !is.org){
+  if(collapse == "full" & !is.org){
       message("Reducing probe data to gene data...")
       pscores <- data.frame(probe2eg,scores=scores[probe2eg$probe_id])
       scores <- unlist(tapply(pscores$scores,as.character(pscores$gene_id),
@@ -106,7 +105,7 @@ allez <- function (scores,
   sigma.globe <- sd(globe)
   G <- length(globe)
   
-  set.data <- if(!is.org & collapse=="none"){
+  set.data <- if(!is.org & collapse != "full"){
     set2probe <- unique(set2probe[,c(set_id,"probe_id","symbol")])
     data.frame(set2probe,gscores[set2probe$probe_id])
   } else {
@@ -150,9 +149,7 @@ allez <- function (scores,
     res <- cbind(data.frame(set.mean=set.mean, set.sd=set.sd,
                       set.size=set.size)[names(z.score),],
                       z.score=z.score)
-   #? if(!is.org & collapse %in% c("none","partial"))
-   #?   names(res)[3] <- "n.probeset"
-    if(!is.org & collapse=="partial") names(res)[4] <- "adjusted z.score"
+    if(!is.org & collapse=="partial") names(res)[4] <- "adj z.score"
   }
 
   if(universe=="local"){
