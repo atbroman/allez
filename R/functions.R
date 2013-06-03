@@ -1,21 +1,4 @@
 ## This is the function library for allez
-
-################################################################################
-#### This function checks whether the input data is binary or not.          ####
-#### If binary, it has to be 0's and 1's.                                   ####
-################################################################################
-fn_isBinary <- function(vect){
-  if( !is.numeric(vect) ) stop("scores must be numeric")  
-  if(length(unique(vect)) == 2 & max(vect) == 1){
-    Is.Binary <- 1
-  } else if(length(unique(vect)) == 2 & max(vect) != 1){
-    stop('!!! Binary Data only accepted in the form of 0\'s and 1\'s !!! ')
-    Is.Binary <- 0
-  } else{
-    Is.Binary <- 0
-  }
-  return(Is.Binary)
-}
 ################################################################################
 
 ################################################################################
@@ -119,18 +102,10 @@ sigma.fun.Nandi <- function(m, E, esig2) {
   sd.x
 }
 
-fn_getSetStats <- function(SetData, Stat=mean, set_id=set_id){
-  set.stats.df <- aggregate(SetData$gscores, by=list(SetData[,set_id]),
-                            FUN=Stat)
-  set.stats <- set.stats.df$x
-  names(set.stats) <- set.stats.df$Group.1
-  return(set.stats)
-}
-
 ## Local Universe ##
 local.max <- function(setscores){
-  if(!as.logical(grep("local.zscore",colnames(setscores))))
-    stop("setscores must be from universe='local'")
+#  if(!as.logical(grep("local.zscore",colnames(setscores))))
+#    stop("setscores must be from universe='local'")
   do.call(rbind,by(setscores,setscores[,1],
      function(x) x[which.max(x$local.zscore),]))
 }

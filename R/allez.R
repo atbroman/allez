@@ -113,19 +113,13 @@ allez <- function (scores,
   class(set.size) <- "array"
 
 ## Globe variable ##
-  globe <- switch(sets, GO={
+  globe <- if(sets=="GO"){
     ## GO:0008150 = bio process ##
     ## GO:0003674 = mol function ##
     ## GO:0005575 = cel component ##
     bpmfcc <- c("GO:0008150","GO:0003674","GO:0005575")
-    if(!is.org & collapse!="full")
-      gscores[unique(set2probe$probe_id[set2probe$go_id %in% bpmfcc])] else 
-      gscores[unique(set2eg$gene_id[set2eg$go_id %in% bpmfcc])]
-  },
-  KEGG={if(!is.org & collapse!="full")
-          gscores[unique(set2probe$probe_id)] else
-          gscores[unique(set2eg$gene_id)]
-  })
+    gscores[unique(set.data[set.data[,1] %in% bpmfcc,2])]
+  } else gscores[unique(set.data[,2])]
 
   mu.globe <- mean(globe)
   sigma.globe <- sd(globe)
