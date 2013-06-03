@@ -96,15 +96,8 @@ allez <- function (scores,
              binary = {
                warning("cutoff used at collapsed gene level not probe level")
                1 * (scores >= cutoff) })
-  
-## This needs to be changed for GO ?? check old allez code ##
-  globe <- switch(sets,GO=gscores,
-                  KEGG=gscores)
 
-  mu.globe <- mean(globe)
-  sigma.globe <- sd(globe)
-  G <- length(globe)
-  
+  ## Gene Scores and Annotation ##
   set.data <- if(!is.org & collapse != "full"){
     set2probe <- unique(set2probe[,c(set_id,"probe_id","symbol")])
     data.frame(set2probe,gscores[set2probe$probe_id])
@@ -112,15 +105,32 @@ allez <- function (scores,
     set2eg <- unique(set2eg[,c(set_id, 'gene_id', 'symbol')])
     data.frame(set2eg,gscores=gscores[set2eg$gene_id])
   }
-
   set.mean <- unlist(tapply(set.data$gscores,set.data[[set_id]],
                       mean,na.rm=TRUE,simplify=FALSE))
   set.sd <- unlist(tapply(set.data$gscores,set.data[[set_id]],
                     sd,na.rm=TRUE,simplify=FALSE))
-  ## ALL set.size < G, see Annotation section ##
   set.size <- table(set.data[[set_id]])
   class(set.size) <- "array"
 
+## Globe variable ##
+  globe <- switch(sets, GO={
+    ## GO:0008150 = bio process ##
+    ## GO:0003674 = mol function ##
+    ## GO:0005575 = cel component ##
+    bpmfcc <- c("GO:0008150","GO:0003674","GO:0005575")
+    if(!is.org & collapse!="full")
+      gscores[unique(set2probe$probe_id[set2probe$go_id %in% bpmfcc])] else 
+      gscores[unique(set2eg$gene_id[set2eg$go_id %in% bpmfcc])]
+  },
+  KEGG={if(!is.org & collapse!="full")
+          gscores[unique(set2probe$probe_id)] else
+          gscores[unique(set2eg$gene_id)]
+  })
+
+  mu.globe <- mean(globe)
+  sigma.globe <- sd(globe)
+  G <- length(globe)
+  
  if (universe == "global"){
     if (setstat == "mean") {
       dd <- sigma.globe * fact(G=G, m=set.size)
