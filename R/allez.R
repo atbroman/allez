@@ -17,6 +17,12 @@ allez <- function (scores,
   stopifnot(any(!is.na(scores)))
   scorenames <- names(scores)
 
+  sets <- match.arg(sets)
+  universe <- match.arg(universe)
+  transform <- match.arg(transform)
+  collapse <- match.arg(collapse)
+  setstat <- match.arg(setstat)
+
   if (any(duplicated(scorenames))) 
     stop("input IDs must be unique")
   if (any(is.na(scores)))
@@ -34,12 +40,6 @@ allez <- function (scores,
   }
   if(transform=="binary" & !is.numeric(cutoff))
     stop("cutoff must be numeric when transform = 'binary'")
-
-  sets <- match.arg(sets)
-  universe <- match.arg(universe)
-  transform <- match.arg(transform)
-  collapse <- match.arg(collapse)
-  setstat <- match.arg(setstat)
 
   ## Default reduce ##
   uscores <- unique(scores)
@@ -124,6 +124,7 @@ allez <- function (scores,
   mu.globe <- mean(globe)
   sigma.globe <- sd(globe)
   G <- length(globe)
+  E.globe <- fn_getE.Globe(globe=globe)
   
  if (universe == "global"){
     if (setstat == "mean") {
@@ -133,7 +134,6 @@ allez <- function (scores,
   
     if (setstat == "var") {
       ok <- set.size > 3
-      E.globe <- fn_getE.Globe(globe=globe)
       sigma1 <- sapply(set.size[ok], sigma.fun, 
                     E = E.globe, esig2 = sigma.globe^2)
       z.score <- (set.sd[ok]^2 - (sigma.globe^2))/sigma1
@@ -144,24 +144,24 @@ allez <- function (scores,
     }
   
     if (!is.org & collapse == "partial") {
-      set.np <-  table(unique(set2probe[,c(set_id,"probe_id")])[,1])
-      class(set.np) <- "array"
-      z.score <- z.score * sqrt(set.size[names(z.score)]/
-                                set.np[names(z.score)])
+      set.ng <-  table(unique(set2eg[,c(set_id,"gene_id")])[,1])
+      class(set.ng) <- "array"
+      z.score <- z.score * sqrt(set.ng[names(z.score)]/
+                                set.size[names(z.score)])
     }
   
     res <- cbind(data.frame(set.mean=set.mean, set.sd=set.sd,
                       set.size=set.size)[names(z.score),],
                       z.score=z.score)
-    if(!is.org & collapse=="partial") names(res)[4] <- "adj z.score"
+    if(!is.org & collapse=="partial") names(res)[4] <- "adj.z.score"
   }
 
   if(universe=="local"){
     set.names <- if(collapse=="none" & !is.org)
-      tapply(set2probe[,1], set2probe[,2],c) else
-      tapply(set2eg[,1],set2eg[,2],c)
+      tapply(set2probe$probe_id, set2probe$go_id,c) else
+      tapply(set2eg$gene_id,set2eg$go_id,c)
 
-    go.id <- unique(set.data[,1])
+    go.id <- unique(set.data$go_id)
 
     message("Checking parent/child relationships in GO...")
     ## parent info
@@ -198,7 +198,7 @@ allez <- function (scores,
       E.set <- do.call(rbind,tapply(set.data[,"gscores"],
                                   set.data[,1], fn_getE.Globe))
       colnames(E.set) <- paste("M",1:5,sep="")
-      E.par <- E.set[parents[,2],] ## EE
+      E.par <- E.set[parents$go_parent,] ## EE
     ## remove some iffy cases
       ok <- (parents$set.size > 3) & (parents$parent.sds > 0) &
         (parents$set.size < parents$parent.size-2 )  ## a bit of room
@@ -210,7 +210,7 @@ allez <- function (scores,
     ## denominator, global scoring
       den.globe <- sapply(parents$set.size[ok],sigma.fun,
                           E=E.globe, esig2=sigma.globe^2)
-      z0 <- (parents$set.sd^2[ok] - sigma.globe^2 )/den.globe # global z score
+      z0 <- (parents$set.sd^2 - sigma.globe^2)[ok]/den.globe # global z score
     ## Return full results, use local.max() to pull out "best" local.zscore ##
       res.full <- data.frame(parents[ok,], local.zscore=z1,
                                  global.zscore=z0 )
