@@ -100,7 +100,7 @@ allez <- function (scores,
   ## Gene Scores and Annotation ##
   set.data <- if(!is.org & collapse != "full"){
     set2probe <- unique(set2probe[,c(set_id,"probe_id","symbol")])
-    data.frame(set2probe,gscores[set2probe$probe_id])
+    data.frame(set2probe,gscores=gscores[set2probe$probe_id])
   } else {
     set2eg <- unique(set2eg[,c(set_id, 'gene_id', 'symbol')])
     data.frame(set2eg,gscores=gscores[set2eg$gene_id])
@@ -179,33 +179,33 @@ allez <- function (scores,
         data.frame(set.mean=set.mean[parents[,1]], #v.stat if setstat="mean"
             set.sd=set.sd[parents[,1]], #v.stat^2 if setstat="var"
             set.size=set.size[parents[,1]], #v.nset
-            parent.means=set.mean[parents[,2]], #parent.means | v.means
-            parent.sds=set.sd[parents[,2]], #parent.sds | v.sds
+            parent.mean=set.mean[parents[,2]], #parent.means | v.means
+            parent.sd=set.sd[parents[,2]], #parent.sds | v.sds
             parent.size=set.size[parents[,2]]))[in.subset,]
                  #parent.np | n.par | p.np | v.np
 
     message("Computing enrichment ..." )
     if( setstat == "mean" ){
-      den <- parents$parent.sds*fact(parents$parent.size,
+      den <- parents$parent.sd*fact(parents$parent.size,
                                    parents$set.size)
       den.globe <- sigma.globe*fact(G, parents$set.size) 
-      z1 <- (parents$set.mean - parents$parent.means)/den   # local z score
+      z1 <- (parents$set.mean - parents$parent.mean)/den   # local z score
       z0 <- (parents$set.mean - mu.globe )/den.globe   # global z score
       res.full <- data.frame(parents, local.zscore=z1, global.z.score=z0 )
     }
 
     if( setstat=="var" ){
-      E.set <- do.call(rbind,tapply(set.data[,"gscores"],
-                                  set.data[,1], fn_getE.Globe))
+      E.set <- do.call(rbind,tapply(set.data$gscores,
+                                  set.data$go_id, fn_getE.Globe))
       colnames(E.set) <- paste("M",1:5,sep="")
       E.par <- E.set[parents$go_parent,] ## EE
     ## remove some iffy cases
-      ok <- (parents$set.size > 3) & (parents$parent.sds > 0) &
+      ok <- (parents$set.size > 3) & (parents$parent.sd > 0) &
         (parents$set.size < parents$parent.size-2 )  ## a bit of room
     ## denominator, local scoring
-      den <- apply(cbind(parents$set.size, parents$parent.sds^2, E.par)[ok,],
+      den <- apply(cbind(parents$set.size, parents$parent.sd^2, E.par)[ok,],
                1, function(x) sigma.fun(x[1],x[3:7],x[2]))
-      z1 <- (parents$set.sd^2 - parents$parent.sds^2)[ok]/den  # local z score
+      z1 <- (parents$set.sd^2 - parents$parent.sd^2)[ok]/den  # local z score
 
     ## denominator, global scoring
       den.globe <- sapply(parents$set.size[ok],sigma.fun,
