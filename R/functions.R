@@ -85,20 +85,19 @@ fn_getE.Globe <- function(globe){
 
 fact <- function(G, m) sqrt(((G - m)/(G - 1))/m)
 
-sigma.fun <- function(m, E, esig2) {
-  vector <- c(m + 1/m - 2, (m - 1) * (m + 3/m - 2), -4 * (m - 1) * (1 - 1/m), 
-              -2 * (m - 1) * (m - 2) * (1 - 3/m), (m - 1) * (m - 2) * (m - 3)/m)
-  sd.x <- sqrt((sum(vector * E)/((m - 1)^2) - esig2^2))
-  sd.x
-}
+## sigma.fun <- function(m, E, esig2) {
+##   vector <- c(m + 1/m - 2, (m - 1) * (m + 3/m - 2), -4 * (m - 1) * (1 - 1/m), 
+##               -2 * (m - 1) * (m - 2) * (1 - 3/m), (m - 1) * (m - 2) * (m - 3)/m)
+##   sd.x <- sqrt((sum(vector * E)/((m - 1)^2) - esig2^2))
+##   sd.x
+## }
 
-sigma.fun.Nandi <- function(m, E, esig2) {
-  vector <- c((m-1)*(m-1)/m, 
-              (m-1)*(m-1)*(m-2)/m, 
-              -4*(m-1)*(m-1)/m, 
-              -2*(m-1)*(m-2)*(m-3)/m, 
-              (m-1)*(m-2)*(m-3)/m)
-  sd.x <- sqrt((sum(vector * E)/((m - 1)^2) - esig2^2))
+# This function replaces the one above. Notice this has one extra argument
+sigma.fun <- function(m, E, esig2, G){
+  Beta1 <- c(1, -3, -4, 12, -6)
+  Beta2 <- c(0, 1, 0, -2, 1)
+  var.x <- (1/m - 1/G)*Beta1 %*% E.globe + (2/(m - 1) - 2/(G - 1))*Beta2 %*% E.globe
+  sd.x <- sqrt(var.x)
   sd.x
 }
 

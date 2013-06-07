@@ -134,13 +134,9 @@ allez <- function (scores,
   
     if (setstat == "var") {
       ok <- set.size > 3
-      sigma1 <- sapply(set.size[ok], sigma.fun, 
-                    E = E.globe, esig2 = sigma.globe^2)
+      sigma1 <- sapply(X = set.size[ok], FUN = sigma.fun, 
+                    E = E.globe, esig2 = sigma.globe^2, G = G)
       z.score <- (set.sd[ok]^2 - (sigma.globe^2))/sigma1
-      sigma1.Nandi <- apply(X=as.matrix(set.size[ok]), MARGIN=1,
-                          FUN=sigma.fun.Nandi, 
-                          E = E.globe, esig2 = sigma.globe^2)
-      z.score.Nandi <- (set.sd[ok]^2 - (sigma.globe^2))/sigma1.Nandi
     }
   
     if (!is.org & collapse == "partial") {
