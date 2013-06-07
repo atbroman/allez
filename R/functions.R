@@ -93,10 +93,10 @@ fact <- function(G, m) sqrt(((G - m)/(G - 1))/m)
 ## }
 
 # This function replaces the one above. Notice this has one extra argument
-sigma.fun <- function(m, E, esig2, G){
+sigma.fun <- function(m, E, G){
   Beta1 <- c(1, -3, -4, 12, -6)
   Beta2 <- c(0, 1, 0, -2, 1)
-  var.x <- (1/m - 1/G)*Beta1 %*% E.globe + (2/(m - 1) - 2/(G - 1))*Beta2 %*% E.globe
+  var.x <- (1/m - 1/G)*Beta1 %*% E + (2/(m - 1) - 2/(G - 1))*Beta2 %*% E
   sd.x <- sqrt(var.x)
   sd.x
 }
