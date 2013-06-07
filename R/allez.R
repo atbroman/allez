@@ -135,7 +135,7 @@ allez <- function (scores,
     if (setstat == "var") {
       ok <- set.size > 3
       sigma1 <- sapply(X = set.size[ok], FUN = sigma.fun, 
-                    E = E.globe, esig2 = sigma.globe^2, G = G)
+                    E = E.globe, G = G)
       z.score <- (set.sd[ok]^2 - (sigma.globe^2))/sigma1
     }
   
@@ -199,13 +199,13 @@ allez <- function (scores,
       ok <- (parents$set.size > 3) & (parents$parent.sd > 0) &
         (parents$set.size < parents$parent.size-2 )  ## a bit of room
     ## denominator, local scoring
-      den <- apply(cbind(parents$set.size, parents$parent.sd^2, E.par)[ok,],
-               1, function(x) sigma.fun(x[1],x[3:7],x[2]))
+      den <- apply(X = cbind(parents$set.size, parents$parent.size, E.par)[ok,],
+                   MARGIN = 1, FUN = function(x) sigma.fun(m=x[1],E=x[3:7],G=x[2]))
       z1 <- (parents$set.sd^2 - parents$parent.sd^2)[ok]/den  # local z score
 
     ## denominator, global scoring
-      den.globe <- sapply(parents$set.size[ok],sigma.fun,
-                          E=E.globe, esig2=sigma.globe^2)
+      den.globe <- sapply(X = parents$set.size[ok], FUN = sigma.fun,
+                          E = E.globe, G = G)
       z0 <- (parents$set.sd^2 - sigma.globe^2)[ok]/den.globe # global z score
     ## Return full results, use local.max() to pull out "best" local.zscore ##
       res.full <- data.frame(parents[ok,], local.zscore=z1,
