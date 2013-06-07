@@ -114,7 +114,6 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
  of annotated probes (or genes) (this is the `universe' if
  \code{universe="global"}).}
 
- ##????? Is this true????###
  If  \code{universe="local"} and \code{sets="GO"}, \code{aux} also
  contains a matrix recording set-level results for all parents of
  every child set (the \code{setscores} in this case reports only the
@@ -132,7 +131,7 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
   7999-8006.}
 
 
-\author{ Michael Newton, Deepayan Sarkar, }
+\author{ Michael Newton, Deepayan Sarkar, Aimee Teo Broman, Subhrangshu Nandi}
 
 \examples{
 data(npc)
