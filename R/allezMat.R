@@ -8,10 +8,9 @@ allezMat <- function(allez.out,
                      n.cell=0,
                      zthr=3){
 ## Number of genes in list and functional set ##
-  nc <- sapply(rownames(allez.out$setscores), function(x){
-            s <- allez.out$aux$set.data[
-                 allez.out$aux$set.data[,1] %in% x,"gscores"]
-            sum(s>0 & !is.na(x))})
+  nc <- tapply(allez.out$aux$set.data$gscores,
+               allez.out$aux$set.data[,1],
+               function(x) sum(x>0 & !is.na(x)))
 ## Subset of GO/KEGG terms ##
   ok <- (allez.out$setscores$set.size >= n.low) &
          (allez.out$setscores$set.size <= n.upp) &
