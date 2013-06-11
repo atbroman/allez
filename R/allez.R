@@ -1,6 +1,4 @@
 
-## Need to implement GO / local ##
-
 allez <- function (scores,
                    lib,
                    library.loc=NULL,
@@ -55,7 +53,7 @@ allez <- function (scores,
   set_id <- switch(sets, GO="go_id", KEGG="path_id")
   is.org <- substr(lib,1,3)=="org"
   orgpkg <- ifelse(is.org,lib[1],get(paste(lib[1],"ORGPKG",sep="")))
-
+message(paste(round(system.time({
   ## ANNOTATION ##
   message("Converting annotations to data.frames ...")
   if(!is.org & collapse != "full"){
@@ -81,7 +79,7 @@ allez <- function (scores,
        set2eg <- set2eg[set2eg$gene_id %in% egs,]
      } else set2eg <- set2eg[set2eg$gene_id %in% names(scores),]
   }
-
+}),2),collapse=" "))
   ## SCORES ##
   if(collapse == "full" & !is.org){
       message("Reducing probe data to gene data...")
@@ -96,7 +94,7 @@ allez <- function (scores,
              binary = {
                warning("cutoff used at collapsed gene level not probe level")
                1 * (scores >= cutoff) })
-
+message(paste(round(system.time({
   ## Gene Scores and Annotation ##
   set.data <- if(!is.org & collapse != "full"){
     set2probe <- unique(set2probe[,c(set_id,"probe_id","symbol")])
@@ -111,7 +109,7 @@ allez <- function (scores,
                     sd,na.rm=TRUE,simplify=FALSE))
   set.size <- table(set.data[[set_id]])
   class(set.size) <- "array"
-
+}),2),collapse=" "))
 ## Globe variable ##
   globe <- if(sets=="GO"){
     ## GO:0008150 = bio process ##
@@ -125,7 +123,8 @@ allez <- function (scores,
   sigma.globe <- sd(globe)
   G <- length(globe)
   E.globe <- fn_getE.Globe(globe=globe)
-  
+
+message(paste(round(system.time({
  if (universe == "global"){
     if (setstat == "mean") {
       dd <- sigma.globe * fact(G=G, m=set.size)
@@ -213,7 +212,7 @@ allez <- function (scores,
     }
     res <- local.max(res.full)
   }
-
+}),2),collapse=" "))
   aux <- list(set.data = set.data, globe = globe)
   if(universe=="local") aux$res.full <- res.full
   
