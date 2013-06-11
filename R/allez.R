@@ -109,7 +109,7 @@ allez <- function (scores,
                     sd,na.rm=TRUE,simplify=FALSE))
   set.size <- table(set.data[[set_id]])
   class(set.size) <- "array"
-}),2),collapse=" "))
+
 ## Globe variable ##
   globe <- if(sets=="GO"){
     ## GO:0008150 = bio process ##
@@ -124,7 +124,6 @@ allez <- function (scores,
   G <- length(globe)
   E.globe <- fn_getE.Globe(globe=globe)
 
-message(paste(round(system.time({
  if (universe == "global"){
     if (setstat == "mean") {
       dd <- sigma.globe * fact(G=G, m=set.size)
