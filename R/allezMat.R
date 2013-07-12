@@ -7,6 +7,8 @@ allezMat <- function(allez.out,
                      n.upp=500,
                      n.cell=0,
                      zthr=3){
+  ## z.score column ##
+  zcol <- grep("z.score",colnames(allez.out$setscores))[1]
 ## Number of genes in list and functional set ##
   nc <- tapply(allez.out$aux$set.data$gscores,
                allez.out$aux$set.data[,1],
@@ -14,8 +16,8 @@ allezMat <- function(allez.out,
 ## Subset of GO/KEGG terms ##
   ok <- (allez.out$setscores$set.size >= n.low) &
          (allez.out$setscores$set.size <= n.upp) &
-         (allez.out$setscores$z.score >= zthr) &
-         (nc >= n.cell)
+         (allez.out$setscores[,zcol] >= zthr) &
+         (nc[rownames(allez.out$setscores)] >= n.cell)
 ## allez.out$aux$set.data: 1st col = set id; 2nd col = gene id ##
 ## mat: genes by GO/KEGG category, 0 if not in cat, 1 if in category ##
   mat <- sapply(rownames(allez.out$setscores)[ok],function(x)
