@@ -42,6 +42,6 @@ data(npc)
 scores  <- sqrt(28) * log((1-npc)/(1+npc))
 npc.kegg <- allez(scores, lib="hgu133plus2", sets="KEGG")
 
-allezTable(npc.kegg,type="symbol")
+allezTable(npc.kegg,symbol=TRUE)
 
 }
