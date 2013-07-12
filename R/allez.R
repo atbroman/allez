@@ -65,7 +65,7 @@ allez <- function (scores,
      ## remove probes not in scores vector ##
      set2probe <- set2probe[set2probe$probe_id %in% names(scores),]
    }
-  if(collapse != "none"){
+  if(is.org | collapse != "none"){
     ## Use org info for ENTREZ TO GO/KEGG ID ##
     set2eg <- toTable(getDataEnv(name=ifelse(sets=="GO",
               "GO2ALLEGS","PATH2EG"), lib=orgpkg))
