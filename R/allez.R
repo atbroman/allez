@@ -43,7 +43,7 @@ allez <- function (scores,
   uscores <- unique(scores)
   if(is.null(reduce))
    reduce <- if(length(uscores)==2 & identical(uscores,c(0,1))) max else median
-  if(length(uscores)==2 & !identical(uscores,c(0,1)))
+  if(length(uscores)==2 & !all(uscores %in% 0:1))
     warning("if scores are binary, please convert to {0,1}")
 
   message("Loading necessary libraries...")

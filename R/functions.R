@@ -53,7 +53,15 @@ fn_loadPlatformLibraries <- function(Libraries, library.loc=library.loc){
       require(package=lib2, character.only = TRUE, lib.loc=library.loc)
       message( paste( 'Loaded Package', lib2 ))
     }
-    
+    if(!substr(lib,1,3)=="org"){
+      orgpkg <- paste(get(paste(lib,"ORGPKG",sep="")),"db",sep=".")
+      if(!try(require(package=orgpkg, character.only = TRUE,
+                    lib.loc=library.loc), silent=TRUE)){ 
+      stop( paste('Please install', orgpkg)) } else{
+        require(package=orgpkg,character.only = TRUE, lib.loc=library.loc)
+        message( paste( 'Loaded Package', orgpkg))
+      }
+    }
   }
 }
   
