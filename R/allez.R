@@ -75,7 +75,8 @@ allez <- function (scores,
     ## Remove gene_ids not on microarray or scores##
      if(!is.org){
        probe2eg <- toTable(getDataEnv(name="ENTREZID",lib=lib[1]))
-       egs <- unique(probe2eg[probe2eg$probe_id %in% names(scores),"gene_id"])
+       probe2eg <- probe2eg[probe2eg$probe_id %in% names(scores),]
+       egs <- unique(probe2eg[,"gene_id"])
        set2eg <- set2eg[set2eg$gene_id %in% egs,]
      } else set2eg <- set2eg[set2eg$gene_id %in% names(scores),]
   }
