@@ -57,7 +57,7 @@ Aimee Teo Broman and Michael Newton
 }
 \examples{
 data(npc)
-scores  <- sqrt(28) * log((1-npc)/(1+npc))
+scores  <- (1/2)*sqrt(28)*log((1-npc)/(1+npc))
 
 npc.kegg <- allez( scores=scores, lib="hgu133plus2", sets="KEGG")
 

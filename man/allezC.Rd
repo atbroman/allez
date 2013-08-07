@@ -28,7 +28,7 @@ Aimee Teo Broman
 \examples{
 \dontrun{
 data(npc)
-scores  <- sqrt(28) * log((1-npc)/(1+npc))
+scores  <- (1/2)*sqrt(28)*log((1-npc)/(1+npc))
 
 ## GO takes a long time ##
 npc.go <- allez( scores=scores, lib="hgu133plus2", sets="GO")

@@ -22,7 +22,7 @@ about host genes that are negatively correlated with the virus.
 data(npc)
 
 \dontrun{
-scores  <- sqrt(28)*log((1-npc)/(1+npc))
+scores  <- (1/2)*sqrt(28)*log((1-npc)/(1+npc))
 npc.go <- allez(scores, lib="hgu133plus2")
 }
 }
