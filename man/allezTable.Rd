@@ -6,7 +6,8 @@ Extract a table of top-ranked functional sets from allez output
 }
 \description{
 Thresholds allez \code{setscores} element by number of genes in the set
-and z-score; orders sets from highest to lowest set mean.
+and z-score; orders sets from highest to lowest set mean.  A functional set is
+removed if it contains the entire set of input gene scores.
 }
 \usage{
 allezTable(allez.out, n.low = 5, n.upp = 500, n.cell=0, zthr = 5, symbol = FALSE, in.set = FALSE)

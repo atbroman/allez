@@ -106,7 +106,8 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
   the set sample mean ( or set sample variance if \code{setstat="var"} ),
  the set size (number of probes if \code{collapse="none"} and number
  of genes otherwise), and the appropriate Z-score (nominally distributed
- as a standard normal variate).}
+ as a standard normal variate). If a functional set contains the entire
+ set of inputted gene scores, the z-score will output NA.}
 \item{aux}{a list, with auxiliary information from the calculation, 
  including a data frame \code{set.data}, which contains, in table
  format, the map of each gene to a gene

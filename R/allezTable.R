@@ -16,11 +16,14 @@ allezTable <- function(allez.out,
   nc <- tapply(allez.out$aux$set.data$gscores,
                allez.out$aux$set.data[,1],
                function(x) sum(x>0 & !is.na(x)))
-   
+  G <- length(allez.out$aux$globe)
+
+  ## If set.size==G then z.score=NA ##
   ok <- (allez.out$setscores$set.size >= n.low) &
     (allez.out$setscores$set.size <= n.upp) &
+      (allez.out$setscores$set.size < G) &
       (allez.out$setscores[,zcol] >= zthr) &
-        (nc[rownames(allez.out$setscores)] >= n.cell)
+      (nc[rownames(allez.out$setscores)] >= n.cell)
   allez.table <- allez.out$setscores[ok,
                  -grep("sd",names(allez.out$setscores))]
    
