@@ -13,8 +13,14 @@ allez <- function (scores,
                    ...)
 {
   stopifnot(any(!is.na(scores)))
-  scorenames <- names(scores)
 
+  ## Remove NA's from scores ##
+  if (any(is.na(scores))){
+    warning("scores containing NA's will be removed")
+    scores <- scores[!is.na(scores)]
+  }
+
+  scorenames <- names(scores)
   sets <- match.arg(sets)
   universe <- match.arg(universe)
   transform <- match.arg(transform)
@@ -23,11 +29,9 @@ allez <- function (scores,
 
   if (any(duplicated(scorenames))) 
     stop("input IDs must be unique")
-  if (any(is.na(scores)))
-    warning("scores containing NA's will be ignored")
   if( !is.numeric(scores) ) 
     stop("scores must be numeric")
-  vv <- apply( X=as.matrix(scores), MARGIN=2, FUN=var, na.rm=TRUE )
+  vv <- apply( X=as.matrix(scores), MARGIN=2, FUN=var)
   if( min(vv) == 0 )
     stop("no variance in at least one profile" ) 
   if(universe=="local"){
@@ -105,9 +109,9 @@ allez <- function (scores,
     data.frame(set2eg,gscores=gscores[set2eg$gene_id])
   }
   set.mean <- unlist(tapply(set.data$gscores,set.data[[set_id]],
-                      mean,na.rm=TRUE,simplify=FALSE))
+                      mean,simplify=FALSE))
   set.sd <- unlist(tapply(set.data$gscores,set.data[[set_id]],
-                    sd,na.rm=TRUE,simplify=FALSE))
+                    sd,simplify=FALSE))
   set.size <- table(set.data[[set_id]])
   class(set.size) <- "array"
 

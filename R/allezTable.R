@@ -22,7 +22,7 @@ allezTable <- function(allez.out,
   ok <- (allez.out$setscores$set.size >= n.low) &
     (allez.out$setscores$set.size <= n.upp) &
       (allez.out$setscores$set.size < G) &
-      (allez.out$setscores[,zcol] >= zthr) &
+      (abs(allez.out$setscores[,zcol]) >= zthr) &
       (nc[rownames(allez.out$setscores)] >= n.cell)
   allez.table <- allez.out$setscores[ok,
                  -grep("sd",names(allez.out$setscores))]
