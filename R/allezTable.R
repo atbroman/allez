@@ -57,6 +57,6 @@ allezTable <- function(allez.out,
                           character(0))
    }
     ##allez.table$in.set <- allez.table$set.mean*allez.table$n.genes
-  ord <- order(allez.table$set.mean,decreasing=TRUE)
+  ord <- order(abs(allez.table$set.mean),decreasing=TRUE)
   allez.table[ord,]
  }

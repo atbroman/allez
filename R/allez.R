@@ -16,8 +16,8 @@ allez <- function (scores,
 
   ## Remove NA's from scores ##
   if (any(is.na(scores))){
-    warning("scores containing NA's will be removed")
-    scores <- scores[!is.na(scores)]
+    warning("scores containing NA's will be set to 0")
+    scores[is.na(scores)] <- 0
   }
 
   scorenames <- names(scores)
@@ -109,9 +109,9 @@ allez <- function (scores,
     data.frame(set2eg,gscores=gscores[set2eg$gene_id])
   }
   set.mean <- unlist(tapply(set.data$gscores,set.data[[set_id]],
-                      mean,simplify=FALSE))
+                      mean, simplify=FALSE))
   set.sd <- unlist(tapply(set.data$gscores,set.data[[set_id]],
-                    sd,simplify=FALSE))
+                    sd, simplify=FALSE))
   set.size <- table(set.data[[set_id]])
   class(set.size) <- "array"
 
