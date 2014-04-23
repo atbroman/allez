@@ -16,8 +16,8 @@ allez <- function (scores,
 
   ## Remove NA's from scores ##
   if (any(is.na(scores))){
-    warning("scores containing NA's will be set to 0")
-    scores[is.na(scores)] <- 0
+    warning("scores containing NA's will be excluded")
+    scores <- scores[!is.na(scores)]
   }
 
   scorenames <- names(scores)
