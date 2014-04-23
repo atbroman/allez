@@ -15,7 +15,7 @@ allezTable <- function(allez.out,
    ## Number of genes in list and functional set ##
   nc <- tapply(allez.out$aux$set.data$gscores,
                allez.out$aux$set.data[,1],
-               function(x) sum(x>0 & !is.na(x)))
+               function(x) sum(abs(x) > 0 & !is.na(x)))
   G <- length(allez.out$aux$globe)
 
   ## If set.size==G then z.score=NA ##
@@ -43,7 +43,7 @@ allezTable <- function(allez.out,
            "pos","neg"))] else character(0)
 
   if(in.set==TRUE){
-    set.data <- set.data[set.data$gscores>0,]
+    set.data <- set.data[abs(set.data$gscores) > 0,]
     genes <- data.frame(
              pos=tapply(set.data[,idcol],set.data[,1],paste,collapse=";"),
              neg=tapply(set.data[,idcol],set.data[,1],function(x)
