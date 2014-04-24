@@ -15,14 +15,14 @@ allezTable <- function(allez.out,
    ## Number of genes in list and functional set ##
   nc <- tapply(allez.out$aux$set.data$gscores,
                allez.out$aux$set.data[,1],
-               function(x) sum(abs(x) > 0 & !is.na(x)))
+               function(x) sum(abs(x) > 0))
   G <- length(allez.out$aux$globe)
 
   ## If set.size==G then z.score=NA ##
   ok <- (allez.out$setscores$set.size >= n.low) &
     (allez.out$setscores$set.size <= n.upp) &
       (allez.out$setscores$set.size < G) &
-      (allez.out$setscores[,zcol] >= zthr) &
+      (abs(allez.out$setscores[,zcol]) >= zthr) &
       (nc[rownames(allez.out$setscores)] >= n.cell)
   allez.table <- allez.out$setscores[ok,
                  -grep("sd",names(allez.out$setscores))]
@@ -39,8 +39,7 @@ allezTable <- function(allez.out,
                paste(rev(x),collapse=";")))
   allez.table$genes <- if(nrow(allez.table)>0)
     genes[cbind(rownames(allez.table),
-    ifelse(allez.table[,grep("set.mean",names(allez.table))[1]]>0,
-           "pos","neg"))] else character(0)
+    ifelse(allez.table[,zcol]>0,"pos","neg"))] else character(0)
 
   if(in.set==TRUE){
     set.data <- set.data[abs(set.data$gscores) > 0,]
@@ -52,8 +51,7 @@ allezTable <- function(allez.out,
                     in.set=nc[rownames(allez.table)],
                     in.genes=if(nrow(allez.table)>0)
                        genes[cbind(rownames(allez.table),
-                       ifelse(allez.table[,grep("z.score",
-                         names(allez.table))[1]]>0,"pos","neg"))] else
+                       ifelse(allez.table[,zcol]>0,"pos","neg"))] else
                           character(0))
    }
     ##allez.table$in.set <- allez.table$set.mean*allez.table$n.genes
