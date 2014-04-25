@@ -29,7 +29,7 @@ allezTable <- function(allez.out,
       (allez.out$setscores[,zcol] >= zthr) &
       (nc[rownames(allez.out$setscores)] >= n.cell)
   allez.table <- allez.out$setscores[ok,
-                 -grep("sd",names(allez.out$setscores))]
+                 -grep("sd",colnames(allez.out$setscores))]
    
    ## Subset set.data ##
   set.data <- allez.out$aux$set.data[
@@ -43,7 +43,8 @@ allezTable <- function(allez.out,
                paste(rev(x),collapse=";")))
   allez.table$genes <- if(nrow(allez.table)>0)
     genes[cbind(rownames(allez.table),
-    ifelse(allez.table[,zcol]>0,"pos","neg"))] else character(0)
+    ifelse(allez.table[,grep("z.score",colnames(allez.table))[1]]>0,
+           "pos","neg"))] else character(0)
 
   if(in.set==TRUE){
     set.data <- set.data[set.data$gscores > 0,]
@@ -55,7 +56,8 @@ allezTable <- function(allez.out,
                     in.set=nc[rownames(allez.table)],
                     in.genes=if(nrow(allez.table)>0)
                        genes[cbind(rownames(allez.table),
-                       ifelse(allez.table[,zcol]>0,"pos","neg"))] else
+                       ifelse(allez.table[,grep("z.score",
+                          colnames(allez.table))[1]]>0,"pos","neg"))] else
                           character(0))
    }
     ##allez.table$in.set <- allez.table$set.mean*allez.table$n.genes
