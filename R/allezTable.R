@@ -1,5 +1,9 @@
 ## Outputs top GO/KEGG categories ##
 
+## score >= 0
+## z.score is one-sided: z.score < 0 indicate enrichment
+## for genes outside of gene set
+
 allezTable <- function(allez.out,
                        n.low=5,
                        n.upp=500,
@@ -15,14 +19,14 @@ allezTable <- function(allez.out,
    ## Number of genes in list and functional set ##
   nc <- tapply(allez.out$aux$set.data$gscores,
                allez.out$aux$set.data[,1],
-               function(x) sum(abs(x) > 0))
+               function(x) sum(x > 0))
   G <- length(allez.out$aux$globe)
 
   ## If set.size==G then z.score=NA ##
   ok <- (allez.out$setscores$set.size >= n.low) &
     (allez.out$setscores$set.size <= n.upp) &
       (allez.out$setscores$set.size < G) &
-      (abs(allez.out$setscores[,zcol]) >= zthr) &
+      (allez.out$setscores[,zcol] >= zthr) &
       (nc[rownames(allez.out$setscores)] >= n.cell)
   allez.table <- allez.out$setscores[ok,
                  -grep("sd",names(allez.out$setscores))]
@@ -42,7 +46,7 @@ allezTable <- function(allez.out,
     ifelse(allez.table[,zcol]>0,"pos","neg"))] else character(0)
 
   if(in.set==TRUE){
-    set.data <- set.data[abs(set.data$gscores) > 0,]
+    set.data <- set.data[set.data$gscores > 0,]
     genes <- data.frame(
              pos=tapply(set.data[,idcol],set.data[,1],paste,collapse=";"),
              neg=tapply(set.data[,idcol],set.data[,1],function(x)
@@ -55,6 +59,6 @@ allezTable <- function(allez.out,
                           character(0))
    }
     ##allez.table$in.set <- allez.table$set.mean*allez.table$n.genes
-  ord <- order(abs(allez.table$set.mean),decreasing=TRUE)
+  ord <- order(allez.table$set.mean,decreasing=TRUE)
   allez.table[ord,]
  }
