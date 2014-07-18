@@ -51,7 +51,6 @@ allez <- function (scores,
     warning("if scores are binary, please convert to {0,1}")
 
   message("Loading necessary libraries...")
-  fn_loadSetLibraries( sets=sets )
   fn_loadPlatformLibraries( Libraries=lib, library.loc=library.loc )
 
   set_id <- switch(sets, GO="go_id", KEGG="path_id")
@@ -225,6 +224,7 @@ allez <- function (scores,
   }
   if (annotate) {
     message("Labeling output ...")
+    fn_loadSetLibraries( sets=sets )
     if (sets == "GO") {
       gterms <- toTable(GOTERM)
       main <- data.frame(gterms[match(rownames(res),gterms$go_id),

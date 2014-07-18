@@ -5,7 +5,7 @@
 #### This function loads required "set" libraries for allez                 ####
 ################################################################################
 fn_loadSetLibraries <- function(sets){
-  require(annotate)
+#  require(annotate)
   options(warn=-1)
   switch(sets, GO = {
     if( !try(require(GO.db), silent=TRUE) ){
