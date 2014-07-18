@@ -9,7 +9,7 @@ Given a list of genes, a platform (chip type or organism), and GO or
 KEGG category, create a binary vector for input into \code{allez}
 }
 \usage{
-list2score(idlist, lib, idtype = c("SYMBOL", "ENTREZID", "PROBEID", "REFSEQ", "ENSEMBL", "ACCNUM", "UNIPROT", "PMID"), sets = c("GO", "KEGG"))
+list2score(idlist, lib, idtype = c("SYMBOL", "ENTREZID", "PROBEID", "REFSEQ", "ENSEMBL", "ACCNUM", "UNIPROT", "PMID"))
 }
 
 \arguments{
@@ -24,14 +24,10 @@ list2score(idlist, lib, idtype = c("SYMBOL", "ENTREZID", "PROBEID", "REFSEQ", "E
   \item{idtype}{character string, one of "SYMBOL", "ENTREZID", "PROBEID",
   "REFSEQ", "ENSEMBL", "ACCNUM", "UNIPROT", or "PMID"
 }
-  \item{sets}{character string, "GO" or "KEGG", for type of gene set to
-  be used in \code{allez}
-}
 }
 \value{
   Named numeric vector of {0,1}, with names corresponding to all probe_id on the
-  platform or gene_id in the organism database that are connected to a
-  gene set in GO or KEGG.
+  platform or gene_id in the organism database.
 }
 \author{
 Aimee Teo Broman
