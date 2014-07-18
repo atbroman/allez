@@ -39,5 +39,5 @@ Aimee Teo Broman
 library(hgu133plus2.db)
 idlist <- sample(mappedRkeys(hgu133plus2SYMBOL),500)
 
-scores <- list2score(idlist,lib="hgu133plus2",idtype="SYMBOL", sets="KEGG")
+scores <- list2score(idlist,lib="hgu133plus2",idtype="SYMBOL")
 }
