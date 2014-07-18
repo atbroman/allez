@@ -1,9 +1,11 @@
 
 list2score <- function(idlist,lib,
               idtype=c("SYMBOL","ENTREZID","PROBEID","REFSEQ",
-                  "ENSEMBL","ACCNUM","UNIPROT","PMID")){
+                  "ENSEMBL","ACCNUM","UNIPROT","PMID"),
+              sets=c("GO","KEGG")){
 
     idtype <- match.arg(idtype)
+    sets <- match.arg(sets)
 
     gstype <- if(substr(lib,1,3)=="org") "EG" else "PROBE"
     gs <- c(GO=paste("GO2ALL",gstype,"S",sep=""),
@@ -22,8 +24,8 @@ list2score <- function(idlist,lib,
            if(substr(lib,1,3)!="org" & idtype=="PROBEID") idlist else
            toTable(revmap(get(paste(lib,idtype,sep="")))[idlist])[,1]
 
-    ## all EG or PROBEs ##
-    allids <- keys(get(paste(lib,idtype,sep="")))   
+    ## all EG or PROBE in sets ##
+    allids <- mappedLkeys(get(paste(lib,gs[sets],sep="")))   
     
     g <- as.numeric(allids %in% ids)
     names(g) <- allids
