@@ -5,8 +5,9 @@
 Display an image of gene scores by functional sets
 }
 \description{
-Plots the highest ranking functional sets against genes, with highest
-gene scores plotted first.  Gene scores are indicated by darker color.
+Plots functional sets against gene scores.  Sets are ordered by highest
+sum of gene scores not in preceding sets, and genes are ordered by scores
+within set. Higher gene scores are indicated by darker color.
 }
 \usage{
 allezPlot(allez.out, n.low = 5, n.upp = 500, n.cell=0, zthr = 3, gmax=20,

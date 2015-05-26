@@ -2,6 +2,7 @@
 ## Order design matrix ##
 ## 1. Column order by GO/KEGG sum
 ## 2. Row order by GO/KEGG category, gene reduction value
+## 3. Until remaining gene scores sum to 0
 ordMat <- function(aMat,allez.out){
   rind <- cind <- character(0)
   for(i in 1:ncol(aMat)){
@@ -9,10 +10,13 @@ ordMat <- function(aMat,allez.out){
            aMat[-match(rind,rownames(aMat)),
                 -match(cind,colnames(aMat)),drop=FALSE]*
            allez.out$aux$globe[-match(rind,names(allez.out$aux$globe))]
-    smax <- which.max(apply(mat,2,sum)) ## set with highest sum
-    cind <- c(cind,colnames(mat)[smax])
-    rord <- order(mat[,smax],decreasing=TRUE)
-    rind <- c(rind,rownames(mat)[rord][mat[rord,smax]>0])
+    s <- apply(mat,2,sum)
+    if(any(s>0)){    
+        smax <- which.max(apply(mat,2,sum)) ## set with highest sum
+        cind <- c(cind,colnames(mat)[smax])
+        rord <- order(mat[,smax],decreasing=TRUE)
+        rind <- c(rind,rownames(mat)[rord][mat[rord,smax]>0])
+    } else break
   }
   apply(aMat[rind,cind,drop=FALSE],2,"*",allez.out$aux$globe[rind])
 }
