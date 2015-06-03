@@ -5,6 +5,7 @@
 ## 3. Until remaining gene scores sum to 0
 ordMat <- function(aMat,allez.out){
   rind <- cind <- character(0)
+  zc <- grep("z.score",colnames(allez.out$setscores))
   for(i in 1:ncol(aMat)){
     mat <- if(i==1) aMat*allez.out$aux$globe else
            aMat[-match(rind,rownames(aMat)),
@@ -12,7 +13,9 @@ ordMat <- function(aMat,allez.out){
            allez.out$aux$globe[-match(rind,names(allez.out$aux$globe))]
     s <- apply(mat,2,sum)
     if(any(s>0)){    
-        smax <- which.max(apply(mat,2,sum)) ## set with highest sum
+        ## smax <- which.max(s) ## first set with highest sum
+        ## break ties using z.score ##
+        smax <- order(s,allez.out$setscores[names(s),zc],decreasing=TRUE)[1]
         cind <- c(cind,colnames(mat)[smax])
         rord <- order(mat[,smax],decreasing=TRUE)
         rind <- c(rind,rownames(mat)[rord][mat[rord,smax]>0])
