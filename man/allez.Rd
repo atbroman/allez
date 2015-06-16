@@ -15,8 +15,8 @@
  identify sets that show unusual variance characteristics.
 }
 \usage{
-allez(scores, lib, library.loc = NULL, sets = c("GO", "KEGG"), collapse
-= c("full","partial","none"), reduce = NULL, setstat = c("mean", "var"),
+allez(scores, lib, idtype = c("ENTREZID", "SYMBOL"),library.loc = NULL, sets = c("GO", "KEGG"), 
+locallist = NULL, collapse = c("full","partial","none"), reduce = NULL, setstat = c("mean", "var"),
 universe = c("global", "local"), transform = c("none", "binary", "rank",
 "nscore"), cutoff = NULL, annotate = TRUE, ...)
 }
@@ -40,11 +40,19 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
   (\code{"org.Hs.eg"}). A vector of package names is allowed in case
   multiple chips are used (e.g \code{"moe430a"} and \code{"moe430b"} 
   cover the mouse genome.) }
+\item{idtype}{idtype could be either \code{"ENTREZID"} (default) or 
+	\code{"SYMBOL"}. It should match
+names of the scores vector.}
 \item{library.loc}{
 %%     ~~Describe \code{library.loc} here~~
 }
 \item{sets}{character string, describing the collection of
   sets. \code{"GO"} (default) or \code{"KEGG"}}
+\item{locallist}{list contains in-house gene sets of interest. Default is NULL.
+Each element in the list represents a gene set. Each element should be a character
+string containing genes' entrez IDs (if \code{idtype="ENTREZID")} or
+gene symbols (if \code{idtype="STMBOL")}. Element names will be used as 
+set names. If \code{locallist} is not NULL, \code{universe="local"} will be disabled.}
 \item{collapse}{character string, describing the method for reducing
   probe-level data to gene-level data. \code{"full"} (default) uses the
   function \code{reduce} to reduce from 

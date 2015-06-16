@@ -1,8 +1,8 @@
 Package: allez
 Version: 2.0.4
-Date: 2015-06-09
+Date: 2015-06-16
 Title: Random-set calibration of gene-set statistics
-Author: Michael Newton <newton@stat.wisc.edu>, Subhrangshu Nandi, and Aimee Teo Broman
+Author: Michael Newton <newton@stat.wisc.edu>, Subhrangshu Nandi, Ning Leng and Aimee Teo Broman
 Maintainer: Aimee Teo Broman <abroman@biostat.wisc.edu>
 Description: Gene set enrichment calculations for GO and KEGG
 Depends: R (>= 2.10), AnnotationDbi, graphics 
@@ -10,4 +10,4 @@ Suggests: hgu133plus2.db, GO.db, KEGG.db, reactome.db
 LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
-Packaged: 2015-06-09; ningleng
+Packaged: 2015-06-16; ningleng
