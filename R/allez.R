@@ -21,6 +21,8 @@ allez <- function (scores,
     warning("scores containing NA's will be excluded")
     scores <- scores[!is.na(scores)]
   }
+  
+
 
   scorenames <- names(scores)
   sets <- match.arg(sets)
@@ -28,8 +30,14 @@ allez <- function (scores,
   transform <- match.arg(transform)
   collapse <- match.arg(collapse)
   setstat <- match.arg(setstat)
-	idtype <- match.arg(idtype)
-
+  idtype <- match.arg(idtype)
+  
+  # cannot perform local test if input local lists
+  if(universe=="local" & !is.null(locallist)){
+    universe="global"
+    warning("input local list! changed to universe='global' ")
+  }
+  
   if (any(duplicated(scorenames))) 
     stop("input IDs must be unique")
   if( !is.numeric(scores) ) 
@@ -81,7 +89,7 @@ allez <- function (scores,
     ## Remove gene_ids not on microarray or scores##
      if(!is.org){
        probe2eg <- switch(idtype,ENTREZID=toTable(getDataEnv(name="ENTREZID",lib=lib[1])),
-         SYMBOLgetDataEnv(name="SYMBOL",lib=lib[1]))
+         SYMBOL=getDataEnv(name="SYMBOL",lib=lib[1]))
        probe2eg <- probe2eg[probe2eg$probe_id %in% names(scores),]
        egs <- switch(idtype, ENTREZID=unique(probe2eg[,"gene_id"]), SYMBOL=unique(probe2eg[,"symbol"]))
        set2eg <- switch(idtype, ENTREZID=set2eg[set2eg$gene_id %in% egs,], SYMBOL=set2eg[set2eg$symbol %in% egs,])
