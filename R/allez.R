@@ -35,7 +35,7 @@ allez <- function (scores,
   # cannot perform local test if input local lists
   if(universe=="local" & !is.null(locallist)){
     universe="global"
-    warning("input local list! changed to universe='global' ")
+    warning("universe='local' mode is not available when including local list! using universe='global' mode")
   }
   
   if (any(duplicated(scorenames))) 
@@ -107,7 +107,8 @@ allez <- function (scores,
 		SYMBOL=data.frame(cbind(gene_id=set2eg$gene_id[match(localunlist,set2eg$symbol)], 
 			go_id=unlist(sapply(1:locallen,function(k)rep(paste0("Local:",names(locallist)[k]),localeachlen[k]),simplify=F)),
 			Evidence="local", Ontology="local",symbol=localunlist),stringsAsFactors=F))
-		if(set_id=="path_id")names(newlist)[2] <- set_id
+		names(newlist)[2] <- set_id
+		if(set_id=="path_id")newlist <- newlist[c("gene_id","path_id", "symbol")]
 		set2eg <- rbind(newlist,set2eg)
 		}
 		set2eg <- switch(idtype, ENTREZID=set2eg[set2eg$gene_id %in% names(scores),],
