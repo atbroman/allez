@@ -1,8 +1,10 @@
 
 allez <- function (scores,
                    lib,
+                   idtype = c("ENTREZID", "SYMBOL"),
                    library.loc=NULL,
                    sets = c("GO","KEGG"),
+                   locallist = NULL,
                    collapse = c("full", "partial", "none"),
                    reduce = NULL,
                    setstat = c("mean", "var"),
@@ -19,6 +21,8 @@ allez <- function (scores,
     warning("scores containing NA's will be excluded")
     scores <- scores[!is.na(scores)]
   }
+  
+
 
   scorenames <- names(scores)
   sets <- match.arg(sets)
@@ -26,7 +30,14 @@ allez <- function (scores,
   transform <- match.arg(transform)
   collapse <- match.arg(collapse)
   setstat <- match.arg(setstat)
-
+  idtype <- match.arg(idtype)
+  
+  # cannot perform local test if input local lists
+  if(universe=="local" & !is.null(locallist)){
+    universe="global"
+    warning("universe='local' mode is not available when including local list! using universe='global' mode")
+  }
+  
   if (any(duplicated(scorenames))) 
     stop("input IDs must be unique")
   if( !is.numeric(scores) ) 
@@ -55,7 +66,7 @@ allez <- function (scores,
 
   set_id <- switch(sets, GO="go_id", KEGG="path_id")
   is.org <- substr(lib,1,3)=="org"
-  orgpkg <- ifelse(is.org,lib[1],get(paste(lib[1],"ORGPKG",sep="")))
+  orgpkg <- ifelse(is.org,lib[1],paste(lib[1],"ORGPKG",sep=""))
 
   ## ANNOTATION ##
   message("Converting annotations to data.frames ...")
@@ -77,20 +88,42 @@ allez <- function (scores,
               match(set2eg$gene_id,org.symbol$gene_id),"symbol",drop=FALSE])
     ## Remove gene_ids not on microarray or scores##
      if(!is.org){
-       probe2eg <- toTable(getDataEnv(name="ENTREZID",lib=lib[1]))
+       probe2eg <- switch(idtype,ENTREZID=toTable(getDataEnv(name="ENTREZID",lib=lib[1])),
+         SYMBOL=getDataEnv(name="SYMBOL",lib=lib[1]))
        probe2eg <- probe2eg[probe2eg$probe_id %in% names(scores),]
-       egs <- unique(probe2eg[,"gene_id"])
-       set2eg <- set2eg[set2eg$gene_id %in% egs,]
-     } else set2eg <- set2eg[set2eg$gene_id %in% names(scores),]
-  }
+       egs <- switch(idtype, ENTREZID=unique(probe2eg[,"gene_id"]), SYMBOL=unique(probe2eg[,"symbol"]))
+       set2eg <- switch(idtype, ENTREZID=set2eg[set2eg$gene_id %in% egs,], SYMBOL=set2eg[set2eg$symbol %in% egs,])
+     } else {
+# local list
+		if(!is.null(locallist)){
+		if(is.null(names(locallist)))names(locallist) = paste0("L",1:length(locallist))
+		localunlist=unlist(locallist)
+		locallen=length(locallist)
+		localeachlen=sapply(locallist,length)
+		newlist <- switch(idtype, ENTREZID=data.frame(cbind(gene_id=localunlist,
+			go_id=unlist(sapply(1:locallen,function(k)rep(paste0("Local:",names(locallist)[k]),localeachlen[k]),simplify=F)),
+			Evidence="local", Ontology="local",symbol=set2eg$symbol[match(localunlist,set2eg$gene_id)]
+		),stringsAsFactors=F),
+		SYMBOL=data.frame(cbind(gene_id=set2eg$gene_id[match(localunlist,set2eg$symbol)], 
+			go_id=unlist(sapply(1:locallen,function(k)rep(paste0("Local:",names(locallist)[k]),localeachlen[k]),simplify=F)),
+			Evidence="local", Ontology="local",symbol=localunlist),stringsAsFactors=F))
+		names(newlist)[2] <- set_id
+		if(set_id=="path_id")newlist <- newlist[c("gene_id","path_id", "symbol")]
+		set2eg <- rbind(newlist,set2eg)
+		}
+		set2eg <- switch(idtype, ENTREZID=set2eg[set2eg$gene_id %in% names(scores),],
+			SYMBOL=set2eg[set2eg$symbol %in% names(scores),])
+		}}
 
   ## SCORES ##
   if(collapse == "full" & !is.org){
       message("Reducing probe data to gene data...")
       pscores <- data.frame(probe2eg,scores=scores[probe2eg$probe_id])
-      scores <- unlist(tapply(pscores$scores,as.character(pscores$gene_id),
-                       FUN=reduce,simplify=FALSE))
-    }
+      scores <- switch(idtype, ENTREZID=unlist(tapply(pscores$scores,as.character(pscores$gene_id),
+        FUN=reduce,simplify=FALSE)),
+        SYMBOL=unlist(tapply(pscores$scores,as.character(pscores$symbol),
+        FUN=reduce,simplify=FALSE)))
+}
   gscores <- switch(transform,
              none = scores,
              rank = rank(scores),
@@ -105,7 +138,8 @@ allez <- function (scores,
     data.frame(set2probe,gscores=gscores[set2probe$probe_id])
   } else {
     set2eg <- unique(set2eg[,c(set_id, 'gene_id', 'symbol')])
-    data.frame(set2eg,gscores=gscores[set2eg$gene_id])
+    switch(idtype, ENTREZID=data.frame(set2eg,gscores=gscores[set2eg$gene_id]),
+      SYMBOL=data.frame(set2eg,gscores=gscores[set2eg$symbol]))
   }
   set.mean <- unlist(tapply(set.data$gscores,set.data[[set_id]],
                       mean, simplify=FALSE))
@@ -115,13 +149,14 @@ allez <- function (scores,
   class(set.size) <- "array"
 
 ## Globe variable ##
+	cl <- switch(idtype, ENTREZID="gene_id",SYMBOL="symbol")
   globe <- if(sets=="GO"){
     ## GO:0008150 = bio process ##
     ## GO:0003674 = mol function ##
     ## GO:0005575 = cel component ##
     bpmfcc <- c("GO:0008150","GO:0003674","GO:0005575")
-    gscores[unique(set.data[set.data[,1] %in% bpmfcc,2])]
-  } else gscores[unique(set.data[,2])]
+    gscores[unique(set.data[set.data[,1] %in% bpmfcc,cl])]
+  } else gscores[unique(set.data[,cl])]
 
   mu.globe <- mean(globe)
   sigma.globe <- sd(globe)
@@ -142,7 +177,8 @@ allez <- function (scores,
     }
   
     if (!is.org & collapse == "partial") {
-      set.ng <-  table(unique(set2eg[,c(set_id,"gene_id")])[,1])
+      set.ng <-  switch(idtype, ENTREZID=table(unique(set2eg[,c(set_id,"gene_id")])[,1]),
+          SYMBOL=table(unique(set2eg[,c(set_id,"symbol")])[,1]))
       class(set.ng) <- "array"
       z.score <- z.score * sqrt(set.ng[names(z.score)]/
                                 set.size[names(z.score)])
@@ -157,7 +193,8 @@ allez <- function (scores,
   if(universe=="local"){
     set.names <- if(collapse=="none" & !is.org)
       tapply(set2probe$probe_id, set2probe$go_id,c) else
-      tapply(set2eg$gene_id,set2eg$go_id,c)
+      switch(idtype, ENTREZID=tapply(set2eg$gene_id,set2eg$go_id,c),
+        SYMBOL=tapply(set2eg$symbol,set2eg$go_id,c))
 
     go.id <- unique(set.data$go_id)
 
