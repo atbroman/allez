@@ -66,7 +66,7 @@ allez <- function (scores,
 
   set_id <- switch(sets, GO="go_id", KEGG="path_id")
   is.org <- substr(lib,1,3)=="org"
-  orgpkg <- ifelse(is.org,lib[1],paste(lib[1],"ORGPKG",sep=""))
+  orgpkg <- ifelse(is.org,lib[1],get(paste(lib[1],"ORGPKG",sep="")))
 
   ## ANNOTATION ##
   message("Converting annotations to data.frames ...")
