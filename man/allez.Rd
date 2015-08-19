@@ -50,8 +50,8 @@ names of the scores vector.}
   sets. \code{"GO"} (default) or \code{"KEGG"}}
 \item{locallist}{list contains in-house gene sets of interest. Default is NULL.
 Each element in the list represents a gene set. Each element should be a character
-string containing genes' entrez IDs (if \code{idtype="ENTREZID")} or
-gene symbols (if \code{idtype="STMBOL")}. Element names will be used as 
+string containing genes' entrez IDs (if \code{idtype="ENTREZID"}) or
+gene symbols (if \code{idtype="SYMBOL"}). Element names will be used as 
 set names. If \code{locallist} is not NULL, \code{universe="local"} will be disabled.}
 \item{collapse}{character string, describing the method for reducing
   probe-level data to gene-level data. \code{"full"} (default) uses the
