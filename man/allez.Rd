@@ -15,10 +15,13 @@
  identify sets that show unusual variance characteristics.
 }
 \usage{
-allez(scores, lib, idtype = c("ENTREZID", "SYMBOL"),library.loc = NULL, sets = c("GO", "KEGG"), 
-locallist = NULL, collapse = c("full","partial","none"), reduce = NULL, setstat = c("mean", "var"),
-universe = c("global", "local"), transform = c("none", "binary", "rank",
-"nscore"), cutoff = NULL, annotate = TRUE, ...)
+allez(scores, lib, idtype = c("ENTREZID", "SYMBOL"), library.loc = NULL,
+sets = c("GO", "KEGG"), locallist = NULL,
+collapse = c("full","partial","none"),
+reduce = NULL, setstat = c("mean", "var"),
+universe = c("global", "local"),
+transform = c("none", "binary", "rank","nscore"),
+cutoff = NULL, annotate = TRUE)
 }
 
 \arguments{
@@ -40,11 +43,14 @@ universe = c("global", "local"), transform = c("none", "binary", "rank",
   (\code{"org.Hs.eg"}). A vector of package names is allowed in case
   multiple chips are used (e.g \code{"moe430a"} and \code{"moe430b"} 
   cover the mouse genome.) }
-\item{idtype}{idtype could be either \code{"ENTREZID"} (default) or 
-	\code{"SYMBOL"}. It should match
-names of the scores vector.}
+\item{idtype}{character string, either \code{"ENTREZID"} (default) or 
+	\code{"SYMBOL"}, corresponding to the type of names used for the
+  \code{scores} vector.}
 \item{library.loc}{
-%%     ~~Describe \code{library.loc} here~~
+a character vector describling the location of R library trees to search
+  through, or 'NULL'.  The default value of 'NULL' corresponds to all
+  libraries currently known to '.libPaths()'.  Non-existent library
+  trees are silently ignored.
 }
 \item{sets}{character string, describing the collection of
   sets. \code{"GO"} (default) or \code{"KEGG"}}
@@ -62,7 +68,10 @@ set names. If \code{locallist} is not NULL, \code{universe="local"} will be disa
   \code{"partial"} adjustment to the z-scores computed in \code{"full"}
   by the factor sqrt{ n.genes/n.probes }. }
 
-\item{reduce}{ function used in \code{collapse}. }
+\item{reduce}{function to \code{collapse}/summarize gene-level scores;
+  if \code{reduce=NULL} and scores are binary {0,1}, the default is
+  \code{max}, if scores are continuous the default is \code{median}.
+  \code{reduce=mean} is also appropriate for continuous scores.}
 
 \item{setstat}{ \code{"mean"} or \code{"var"} indicating the function
    used to compute unstandardized set scores from microarray level
@@ -90,8 +99,6 @@ set names. If \code{locallist} is not NULL, \code{universe="local"} will be disa
        \code{cutoff} }
     
   \item{annotate}{ logical, whether to include set names in the output }
-
-  \item{\dots}{ Other arguments, passed on \code{reduce}. }
 }
 
 \details{

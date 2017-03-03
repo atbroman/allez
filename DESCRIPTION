@@ -1,5 +1,5 @@
 Package: allez
-Version: 2.0.4
+Version: 2.0.5
 Date: 2015-06-16
 Title: Random-set calibration of gene-set statistics
 Author: Michael Newton <newton@stat.wisc.edu>, Subhrangshu Nandi, Ning Leng and Aimee Teo Broman
@@ -10,4 +10,4 @@ Suggests: hgu133plus2.db, GO.db, KEGG.db, reactome.db
 LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
-Packaged: 2015-06-16; ningleng
+Packaged: 2016-03-03; abroman

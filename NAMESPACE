@@ -13,3 +13,7 @@ importMethodsFrom(AnnotationDbi,get)
 ## import functions ##
 importFrom(graphics, image)
 importFrom(graphics, strwidth)
+importFrom(grDevices, gray)
+importFrom(graphics, axis, par, text)
+importFrom(stats, median, qnorm, sd, var)
+

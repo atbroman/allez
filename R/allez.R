@@ -11,8 +11,7 @@ allez <- function (scores,
                    universe = c("global", "local"),
                    transform = c("none", "binary", "rank", "nscore"),
                    cutoff = NULL,
-                   annotate = TRUE,
-                   ...)
+                   annotate = TRUE)
 {
   stopifnot(any(!is.na(scores)))
 
@@ -22,8 +21,6 @@ allez <- function (scores,
     scores <- scores[!is.na(scores)]
   }
   
-
-
   scorenames <- names(scores)
   sets <- match.arg(sets)
   universe <- match.arg(universe)
@@ -57,7 +54,7 @@ allez <- function (scores,
   ## Default reduce ##
   uscores <- unique(scores)
   if(is.null(reduce))
-   reduce <- if(length(uscores)==2 & identical(uscores,c(0,1))) max else median
+   reduce <- if(length(uscores)==2 & all(uscores %in% 0:1)) max else median
   if(length(uscores)==2 & !all(uscores %in% 0:1))
     warning("if scores are binary, please convert to {0,1}")
 
